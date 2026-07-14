@@ -3,7 +3,7 @@
 import { useAppStore } from '@/lib/store'
 import type { Product } from '@/lib/types'
 import { motion } from 'framer-motion'
-import { Heart, Star, MapPin, Plus, Truck, Sparkles, TrendingDown } from 'lucide-react'
+import { Heart, Star, MapPin, Plus, Truck, Sparkles, TrendingDown, Eye } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface ProductCardProps {
@@ -13,7 +13,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, compact = false, index = 0 }: ProductCardProps) {
-  const { addToCart, wishlist, toggleWishlist, setSelectedProduct } = useAppStore()
+  const { addToCart, wishlist, toggleWishlist, setSelectedProduct, setQuickViewProduct } = useAppStore()
   const isWishlisted = wishlist.includes(product.id)
 
   const handleAdd = (e: React.MouseEvent) => {
@@ -78,6 +78,19 @@ export function ProductCard({ product, compact = false, index = 0 }: ProductCard
           >
             <Heart className={`h-4 w-4 transition-colors ${isWishlisted ? 'fill-destructive text-destructive' : 'text-foreground'}`} />
           </motion.span>
+        </motion.button>
+
+        {/* Quick View button — appears on hover (desktop) / always (mobile) */}
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={(e) => {
+            e.stopPropagation()
+            setQuickViewProduct(product)
+          }}
+          className="absolute right-2.5 top-12 flex h-8 w-8 items-center justify-center rounded-full glass-strong tap-highlight-none transition-shadow md:opacity-0 md:group-hover:opacity-100 md:hover:shadow-sm"
+          aria-label={`Quick view ${product.name}`}
+        >
+          <Eye className="h-4 w-4" />
         </motion.button>
 
         {/* AI savings tip — always visible on mobile (hover on desktop) */}

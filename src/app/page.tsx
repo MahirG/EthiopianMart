@@ -3,9 +3,11 @@
 import { useAppStore } from '@/lib/store'
 import { Header } from '@/components/header'
 import { BottomNav } from '@/components/bottom-nav'
+import { Footer } from '@/components/footer'
 import { NotificationsPanel } from '@/components/notifications-panel'
 import { AIAssistant } from '@/components/ai-assistant'
 import { FloatingAIButton } from '@/components/floating-ai-button'
+import { QuickViewModal } from '@/components/quick-view-modal'
 import { HomeView } from '@/components/home-view'
 import { SearchView } from '@/components/search-view'
 import { CartView } from '@/components/cart-view'
@@ -37,6 +39,9 @@ export default function Home() {
     }
   }
 
+  // Views that should show the footer (main shopping views, not modals/dashboards)
+  const showFooter = ['home', 'search', 'cart', 'orders', 'profile'].includes(view)
+
   return (
     <div className="min-h-screen flex flex-col gradient-mesh">
       <Header />
@@ -57,10 +62,12 @@ export default function Home() {
         </AnimatePresence>
       </main>
 
+      {showFooter && <Footer />}
       <BottomNav />
       <FloatingAIButton />
       <NotificationsPanel />
       <AIAssistant />
+      <QuickViewModal />
     </div>
   )
 }

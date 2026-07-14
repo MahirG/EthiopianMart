@@ -216,3 +216,140 @@ export const aiSuggestions = [
   'Bundle these 3 items and save 450 Birr',
   'Price prediction: Buy now, prices rising next week',
 ]
+
+// Best sellers — sorted by sales volume
+export const bestSellers = [
+  ...products.filter((p) => p.rating >= 4.7).slice(0, 6),
+]
+
+// Customer reviews for homepage social proof
+export const customerReviews = [
+  {
+    id: 'r1',
+    name: 'Hanna Tadesse',
+    avatar: 'HT',
+    location: 'Addis Ababa',
+    rating: 5,
+    text: 'Gebeya completely changed how I shop. The AI assistant helped me find the cheapest Samsung phone and I saved 3,600 Birr! Delivery was next-day to Bole. This is the future of Ethiopian shopping.',
+    product: 'Samsung Galaxy A15',
+    color: 'from-rose-500 to-pink-600',
+  },
+  {
+    id: 'r2',
+    name: 'Dawit Kebede',
+    avatar: 'DK',
+    location: 'Bahir Dar',
+    rating: 5,
+    text: 'I ordered Yirgacheffe coffee direct from the farmer. The quality is incredible and the price was 23% lower than my local store. The live delivery tracking is amazing — I could see exactly where my order was.',
+    product: 'Yirgacheffe Premium Coffee',
+    color: 'from-amber-500 to-orange-600',
+  },
+  {
+    id: 'r3',
+    name: 'Sara Mohammed',
+    avatar: 'SM',
+    location: 'Adama',
+    rating: 5,
+    text: 'As a vendor, Gebeya transformed my business. The AI tools helped me optimize pricing and I\'ve increased sales by 40% in 3 months. The dashboard analytics are world-class. Highly recommended for all Ethiopian sellers.',
+    product: 'Vendor Dashboard',
+    color: 'from-violet-500 to-purple-600',
+  },
+  {
+    id: 'r4',
+    name: 'Yohannes Bekele',
+    avatar: 'YB',
+    location: 'Mekelle',
+    rating: 5,
+    text: 'The Habesha Kemis I ordered for my wedding was handmade and absolutely stunning. The artisan who made it was verified, and the quality exceeded my expectations. Gebeya supports local Ethiopian craftsmanship.',
+    product: 'Habesha Kemis',
+    color: 'from-emerald-500 to-teal-600',
+  },
+  {
+    id: 'r5',
+    name: 'Meron Girma',
+    avatar: 'MG',
+    location: 'Hawassa',
+    rating: 5,
+    text: 'Telebirr payment was instant and seamless. The cashback rewards have saved me over 1,300 Birr this year. The app works perfectly even on slower networks — Gebeya truly understands Ethiopian infrastructure.',
+    product: 'Gebeya Wallet',
+    color: 'from-teal-500 to-cyan-600',
+  },
+  {
+    id: 'r6',
+    name: 'Abel Tesfaye',
+    avatar: 'AT',
+    location: 'Jimma',
+    rating: 5,
+    text: 'The AI price prediction told me to wait 3 days for a better deal on cooking oil — and it was right! I saved 400 Birr. No other shopping app in Ethiopia offers this level of intelligence. Gebeya is a game-changer.',
+    product: 'AI Price Prediction',
+    color: 'from-orange-500 to-red-600',
+  },
+]
+
+// Brand highlights — trusted partner brands
+export const brandHighlights = [
+  { name: 'Samsung', icon: '📱', products: 340 },
+  { name: 'JBL', icon: '🔊', products: 87 },
+  { name: 'Yirgacheffe', icon: '☕', products: 145 },
+  { name: 'Habesha', icon: '👗', products: 234 },
+  { name: 'Highland', icon: '🌾', products: 56 },
+  { name: 'Addis Pharma', icon: '💊', products: 890 },
+  { name: 'Maru Fashion', icon: '👜', products: 234 },
+  { name: 'Spice Garden', icon: '🌶️', products: 78 },
+]
+
+// Product reviews for product detail page
+export const productReviews = [
+  { id: 'pr1', name: 'Hanna T.', avatar: 'HT', rating: 5, date: '3 days ago', verified: true, text: 'Exceeded my expectations! The quality is premium and delivery was faster than promised. Will definitely buy again.', helpful: 24 },
+  { id: 'pr2', name: 'Dawit K.', avatar: 'DK', rating: 5, date: '1 week ago', verified: true, text: 'Best price I found anywhere in Addis. The AI bundle suggestion saved me 530 Birr. Highly recommend!', helpful: 18 },
+  { id: 'pr3', name: 'Sara M.', avatar: 'SM', rating: 4, date: '2 weeks ago', verified: true, text: 'Great product overall. Took 2 days to arrive but the tracking was accurate. Packaging was excellent.', helpful: 12 },
+  { id: 'pr4', name: 'Yohannes B.', avatar: 'YB', rating: 5, date: '3 weeks ago', verified: true, text: 'Authentic Ethiopian quality. Support local businesses! The vendor was responsive and helpful.', helpful: 31 },
+]
+
+// Frequently bought together
+export const frequentlyBoughtTogether = [
+  { id: 'fbt1', name: 'Yirgacheffe Coffee 1kg', price: 850, icon: '☕' },
+  { id: 'fbt2', name: 'Berbere Spice 500g', price: 320, icon: '🌶️' },
+  { id: 'fbt3', name: 'Teff Flour 5kg', price: 480, icon: '🌾' },
+]
+
+// Coupons for checkout
+export const coupons = [
+  { code: 'WELCOME10', discount: 10, type: 'percent' as const, description: '10% off your first order', minOrder: 0 },
+  { code: 'GEBEYA500', discount: 500, type: 'fixed' as const, description: '500 ETB off orders over 5,000', minOrder: 5000 },
+  { code: 'COFFEE23', discount: 23, type: 'percent' as const, description: '23% off all coffee products', minOrder: 0 },
+  { code: 'FRIDAY18', discount: 18, type: 'percent' as const, description: 'Friday flash sale — 18% off', minOrder: 1000 },
+]
+
+// Product specifications (generic template applied to products)
+export const productSpecs = [
+  { label: 'Brand', value: 'Premium Ethiopian' },
+  { label: 'Origin', value: 'Made in Ethiopia' },
+  { label: 'Weight', value: '1 kg' },
+  { label: 'Dimensions', value: '20 × 15 × 5 cm' },
+  { label: 'Material', value: 'Premium Quality' },
+  { label: 'Warranty', value: '1 Year' },
+  { label: 'SKU', value: 'GEB-2024-PREM' },
+  { label: 'Availability', value: 'In Stock' },
+]
+
+// Product variants for product detail page
+export const productVariants = [
+  { id: 'v1', name: 'Size', options: ['Small', 'Medium', 'Large', 'XL'] },
+  { id: 'v2', name: 'Color', options: ['Default', 'Premium', 'Limited Edition'] },
+]
+
+// Search suggestions for instant search
+export const searchSuggestions = [
+  'Yirgacheffe coffee', 'Samsung phone', 'Berbere spice', 'Teff flour',
+  'Habesha kemis', 'Cooking oil', 'Bluetooth speaker', 'Leather bag',
+  'Shea butter', 'Paracetamol', 'Injera mitad', 'Macchiato maker',
+]
+
+// Trust signals for checkout
+export const trustSignals = [
+  { icon: '🔒', title: 'PCI DSS Compliant', desc: 'Bank-grade encryption' },
+  { icon: '✓', title: 'Verified Vendor', desc: 'Identity confirmed' },
+  { icon: '🚚', title: 'Protected Delivery', desc: 'Full refund guarantee' },
+  { icon: '↩', title: '7-Day Returns', desc: 'Hassle-free returns' },
+]

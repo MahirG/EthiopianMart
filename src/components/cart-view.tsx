@@ -20,18 +20,35 @@ const itemVariants = {
 }
 
 export function CartView() {
-  const { language, cart, updateQty, removeFromCart, cartTotal, clearCart, setView, addSavings } = useAppStore()
+  const { language, cart, updateQty, removeFromCart, cartTotal, clearCart, setView, addSavings, appliedCoupon, applyCoupon, removeCoupon } = useAppStore()
 
   // Read step from local state via a workaround — we keep the original logic
   // by storing step in window? No — let's use useState here.
   // Actually we need to preserve the original step state. Let me use useState.
   const [step, setStep] = useStateLocal<'cart' | 'address' | 'payment' | 'success'>('cart')
   const [selectedPayment, setSelectedPayment] = useStateLocal('telebirr')
+  const [couponInput, setCouponInput] = useStateLocal('')
 
   const subtotal = cartTotal()
   const deliveryFee = subtotal > 500 ? 0 : 50
-  const total = subtotal + deliveryFee
+  const couponDiscount = appliedCoupon
+    ? appliedCoupon.type === 'percent'
+      ? Math.round(subtotal * appliedCoupon.discount / 100)
+      : appliedCoupon.discount
+    : 0
+  const total = subtotal + deliveryFee - couponDiscount
   const savings = cart.reduce((sum, i) => sum + (i.product.bundleSavings || 0) * i.quantity, 0)
+
+  const handleApplyCoupon = () => {
+    if (!couponInput.trim()) return
+    const success = applyCoupon(couponInput)
+    if (success) {
+      toast.success(`Coupon "${couponInput.toUpperCase()}" applied! 🎉`)
+      setCouponInput('')
+    } else {
+      toast.error('Invalid coupon code or minimum order not met')
+    }
+  }
 
   const handleCheckout = () => {
     if (cart.length === 0) return
@@ -427,6 +444,23 @@ export function CartView() {
           </span>
           <span className="font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">-{savings.toLocaleString()} ETB</span>
         </div>
+        {appliedCoupon && couponDiscount > 0 && (
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground flex items-center gap-1">
+              <Tag className="h-3 w-3" /> Coupon ({appliedCoupon.code})
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">-{couponDiscount.toLocaleString()} ETB</span>
+              <button
+                onClick={() => { removeCoupon(); toast.info('Coupon removed') }}
+                className="text-xs text-destructive hover:underline tap-highlight-none"
+                aria-label="Remove coupon"
+              >
+                Remove
+              </button>
+            </span>
+          </div>
+        )}
         <div className="h-px bg-border my-2" />
         <div className="flex justify-between items-baseline">
           <span className="font-bold">{t(language, 'total')}</span>
@@ -436,6 +470,42 @@ export function CartView() {
           </div>
         </div>
       </div>
+
+      {/* Coupon input */}
+      {step === 'cart' && !appliedCoupon && (
+        <div className="rounded-2xl glass p-3">
+          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Have a coupon code?</label>
+          <div className="flex gap-2 mt-2">
+            <input
+              type="text"
+              value={couponInput}
+              onChange={(e) => setCouponInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
+              placeholder="e.g. WELCOME10"
+              className="flex-1 rounded-xl bg-accent/50 px-3 py-2 text-sm outline-none focus:ring-2 ring-primary transition-shadow uppercase"
+              aria-label="Coupon code"
+            />
+            <button
+              onClick={handleApplyCoupon}
+              className="rounded-xl gradient-emerald px-4 py-2 text-sm font-bold text-primary-foreground shadow-glow tap-highlight-none"
+            >
+              Apply
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            <span className="text-[10px] text-muted-foreground">Try:</span>
+            {['WELCOME10', 'COFFEE23', 'FRIDAY18'].map((c) => (
+              <button
+                key={c}
+                onClick={() => { setCouponInput(c); }}
+                className="rounded-full bg-accent hover:bg-accent/70 px-2 py-0.5 text-[10px] font-bold transition-colors tap-highlight-none"
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* CTA */}
       <div className="flex gap-2">

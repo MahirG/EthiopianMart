@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Language, View, CartItem, Product, ChatMessage } from './types'
-import { aiQuickPrompts } from './data'
+import { aiQuickPrompts, coupons } from './data'
 
 interface AppState {
   // Navigation
@@ -9,6 +9,14 @@ interface AppState {
   setView: (v: View) => void
   selectedProduct: Product | null
   setSelectedProduct: (p: Product | null) => void
+
+  // Quick View modal
+  quickViewProduct: Product | null
+  setQuickViewProduct: (p: Product | null) => void
+
+  // Recently viewed
+  recentlyViewed: string[]
+  addRecentlyViewed: (id: string) => void
 
   // Theme & Language
   theme: 'light' | 'dark'
@@ -24,6 +32,11 @@ interface AppState {
   clearCart: () => void
   cartCount: () => number
   cartTotal: () => number
+
+  // Coupon
+  appliedCoupon: { code: string; discount: number; type: 'percent' | 'fixed' } | null
+  applyCoupon: (code: string) => boolean
+  removeCoupon: () => void
 
   // Wishlist
   wishlist: string[]
@@ -57,7 +70,24 @@ export const useAppStore = create<AppState>()(
       view: 'home',
       setView: (v) => set({ view: v }),
       selectedProduct: null,
-      setSelectedProduct: (p) => set({ selectedProduct: p, view: p ? 'product' : get().view }),
+      setSelectedProduct: (p) => {
+        set({ selectedProduct: p, view: p ? 'product' : get().view })
+        if (p) {
+          // Track recently viewed
+          const current = get().recentlyViewed.filter((id) => id !== p.id)
+          set({ recentlyViewed: [p.id, ...current].slice(0, 8) })
+        }
+      },
+
+      quickViewProduct: null,
+      setQuickViewProduct: (p) => set({ quickViewProduct: p }),
+
+      recentlyViewed: [],
+      addRecentlyViewed: (id) =>
+        set((s) => {
+          const filtered = s.recentlyViewed.filter((r) => r !== id)
+          return { recentlyViewed: [id, ...filtered].slice(0, 8) }
+        }),
 
       theme: 'light',
       toggleTheme: () => set((s) => ({ theme: s.theme === 'light' ? 'dark' : 'light' })),
@@ -84,9 +114,20 @@ export const useAppStore = create<AppState>()(
             ? s.cart.filter((i) => i.product.id !== id)
             : s.cart.map((i) => (i.product.id === id ? { ...i, quantity: qty } : i)),
         })),
-      clearCart: () => set({ cart: [] }),
+      clearCart: () => set({ cart: [], appliedCoupon: null }),
       cartCount: () => get().cart.reduce((sum, i) => sum + i.quantity, 0),
       cartTotal: () => get().cart.reduce((sum, i) => sum + i.product.price * i.quantity, 0),
+
+      appliedCoupon: null,
+      applyCoupon: (code) => {
+        const coupon = coupons.find((c) => c.code === code.toUpperCase())
+        if (!coupon) return false
+        const total = get().cartTotal()
+        if (total < coupon.minOrder) return false
+        set({ appliedCoupon: { code: coupon.code, discount: coupon.discount, type: coupon.type } })
+        return true
+      },
+      removeCoupon: () => set({ appliedCoupon: null }),
 
       wishlist: ['p1', 'p4'],
       toggleWishlist: (id) =>
@@ -128,6 +169,7 @@ export const useAppStore = create<AppState>()(
       partialize: (s) => ({
         theme: s.theme, language: s.language, cart: s.cart,
         wishlist: s.wishlist, savedTotal: s.savedTotal,
+        recentlyViewed: s.recentlyViewed,
       }),
     }
   )

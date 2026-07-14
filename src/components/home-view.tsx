@@ -2,7 +2,7 @@
 
 import { useAppStore } from '@/lib/store'
 import { t } from '@/lib/i18n'
-import { categories, products } from '@/lib/data'
+import { categories, products, bestSellers, customerReviews, brandHighlights } from '@/lib/data'
 import { ProductCard } from './product-card'
 import { motion } from 'framer-motion'
 import {
@@ -437,6 +437,109 @@ export function HomeView() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {newArrivals.map((p, i) => (
             <ProductCard key={p.id} product={p} index={i} />
+          ))}
+        </div>
+      </section>
+
+      {/* Best Sellers */}
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-black flex items-center gap-2 font-display tracking-tight">
+            <Award className="h-5 w-5 text-amber-500" />
+            <span className="text-gradient-gold">Best Sellers</span>
+          </h2>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            className="text-sm font-semibold text-primary flex items-center gap-1 hover:gap-2 transition-all"
+          >
+            {t(language, 'viewAll')} <ChevronRight className="h-4 w-4" />
+          </motion.button>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {bestSellers.map((p, i) => (
+            <ProductCard key={p.id} product={p} index={i} />
+          ))}
+        </div>
+      </section>
+
+      {/* Customer Reviews */}
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-black flex items-center gap-2 font-display tracking-tight">
+              <Star className="h-5 w-5 fill-amber-500 text-amber-500" />
+              <span className="text-gradient-emerald">What Our Customers Say</span>
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1">Real reviews from verified Ethiopian shoppers</p>
+          </div>
+          <div className="text-right">
+            <div className="text-2xl font-black">4.9/5</div>
+            <div className="text-xs text-muted-foreground">2.4M+ reviews</div>
+          </div>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {customerReviews.map((review, i) => (
+            <motion.div
+              key={review.id}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-30px' }}
+              transition={{ delay: i * 0.08 }}
+              className="rounded-2xl glass p-4 flex flex-col"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br ${review.color} text-white font-bold text-sm`}>
+                  {review.avatar}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-sm truncate">{review.name}</div>
+                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                    <MapPin className="h-3 w-3" /> {review.location}
+                  </div>
+                </div>
+                <div className="flex gap-0.5">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star key={s} className="h-3 w-3 fill-amber-500 text-amber-500" />
+                  ))}
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed flex-1 line-clamp-4">{review.text}</p>
+              <div className="mt-3 pt-3 border-t border-border/30">
+                <span className="text-xs font-semibold text-primary">✓ Verified Purchase</span>
+                <span className="text-xs text-muted-foreground ml-2">— {review.product}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Brand Highlights */}
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-black flex items-center gap-2 font-display tracking-tight">
+            <Award className="h-5 w-5 text-primary" />
+            <span className="text-gradient-emerald">Trusted Brands</span>
+          </h2>
+        </div>
+        <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
+          {brandHighlights.map((brand, i) => (
+            <motion.button
+              key={brand.name}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+              whileHover={{ y: -3, scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setView('search')}
+              className="flex flex-col items-center gap-2 rounded-2xl glass p-3 hover:shadow-premium transition-shadow tap-highlight-none"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent/40 to-muted text-2xl">
+                {brand.icon}
+              </div>
+              <span className="text-xs font-bold truncate">{brand.name}</span>
+              <span className="text-[10px] text-muted-foreground">{brand.products} products</span>
+            </motion.button>
           ))}
         </div>
       </section>

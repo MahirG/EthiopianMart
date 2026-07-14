@@ -55,6 +55,12 @@ interface AppState {
   // Toast / saved
   savedTotal: number
   addSavings: (amt: number) => void
+
+  // Auth modal
+  authModalOpen: boolean
+  authMode: 'login' | 'register'
+  openAuth: (mode?: 'login' | 'register') => void
+  closeAuth: () => void
 }
 
 const initialAssistantMessage: ChatMessage = {
@@ -163,6 +169,11 @@ export const useAppStore = create<AppState>()(
 
       savedTotal: 8450,
       addSavings: (amt) => set((s) => ({ savedTotal: s.savedTotal + amt })),
+
+      authModalOpen: false,
+      authMode: 'login',
+      openAuth: (mode = 'login') => set({ authModalOpen: true, authMode: mode }),
+      closeAuth: () => set({ authModalOpen: false }),
     }),
     {
       name: 'gulit-shop-store',

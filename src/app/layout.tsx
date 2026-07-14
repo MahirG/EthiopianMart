@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ScrollProgress } from "@/components/scroll-progress";
+import { Providers } from "@/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -70,15 +71,17 @@ export default function RootLayout({
       >
         <a href="#main-content" className="skip-link">Skip to content</a>
         <ThemeProvider>
-          <ScrollProgress />
-          {children}
-          <Toaster />
-          <SonnerToaster position="top-center" richColors toastOptions={{
-            style: {
-              borderRadius: "var(--radius-lg)",
-              backdropFilter: "blur(20px)",
-            },
-          }} />
+          <Providers>
+            <ScrollProgress />
+            {children}
+            <Toaster />
+            <SonnerToaster position="top-center" richColors toastOptions={{
+              style: {
+                borderRadius: "var(--radius-lg)",
+                backdropFilter: "blur(20px)",
+              },
+            }} />
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

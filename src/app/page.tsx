@@ -8,6 +8,7 @@ import { NotificationsPanel } from '@/components/notifications-panel'
 import { AIAssistant } from '@/components/ai-assistant'
 import { FloatingAIButton } from '@/components/floating-ai-button'
 import { QuickViewModal } from '@/components/quick-view-modal'
+import { AuthModal } from '@/components/auth-modal'
 import { HomeView } from '@/components/home-view'
 import { SearchView } from '@/components/search-view'
 import { CartView } from '@/components/cart-view'
@@ -21,7 +22,7 @@ import { AIAssistantView } from '@/components/ai-assistant-view'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Home() {
-  const { view } = useAppStore()
+  const { view, authModalOpen, authMode, closeAuth } = useAppStore()
 
   const renderView = () => {
     switch (view) {
@@ -68,6 +69,7 @@ export default function Home() {
       <NotificationsPanel />
       <AIAssistant />
       <QuickViewModal />
+      <AuthModal open={authModalOpen} onClose={closeAuth} mode={authMode} />
     </div>
   )
 }

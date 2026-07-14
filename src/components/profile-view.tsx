@@ -4,21 +4,29 @@ import { useAppStore } from '@/lib/store'
 import { t } from '@/lib/i18n'
 import { membershipTiers } from '@/lib/data'
 import { motion } from 'framer-motion'
+import { useSession, signOut } from 'next-auth/react'
 import {
   Crown, Check, Star, Package, Heart, MapPin, Settings, HelpCircle,
   Shield, Bell, Globe, LogOut, ChevronRight, Sparkles, TrendingUp,
-  Fingerprint, Smartphone, Award, Gift, Store,
+  Fingerprint, Smartphone, Award, Gift, Store, User as UserIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function ProfileView() {
-  const { language, setView, theme, toggleTheme, wishlist } = useAppStore()
+  const { language, setView, theme, toggleTheme, wishlist, openAuth } = useAppStore()
+  const { data: session, status } = useSession()
+
+  const isLoggedIn = status === 'authenticated' && !!session?.user
+  const userName = session?.user?.name || 'Guest User'
+  const userEmail = session?.user?.email || ''
+  const userRole = (session?.user as { role?: string })?.role || 'GUEST'
+  const initials = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
 
   const menuItems = [
-    { icon: Package, label: t(language, 'myOrders'), action: () => setView('orders'), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10' },
-    { icon: Heart, label: t(language, 'wishlist'), badge: wishlist.length, action: () => toast.info('Wishlist opened'), color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-500/10' },
-    { icon: MapPin, label: t(language, 'addresses'), action: () => toast.info('Addresses opened'), color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-500/10' },
-    { icon: Bell, label: 'Notifications', action: () => toast.info('Notifications opened'), color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500/10' },
+    { icon: Package, label: t(language, 'myOrders'), action: () => isLoggedIn ? setView('orders') : openAuth('login'), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10' },
+    { icon: Heart, label: t(language, 'wishlist'), badge: wishlist.length, action: () => isLoggedIn ? toast.info('Wishlist opened') : openAuth('login'), color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-500/10' },
+    { icon: MapPin, label: t(language, 'addresses'), action: () => isLoggedIn ? toast.info('Addresses opened') : openAuth('login'), color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-500/10' },
+    { icon: Bell, label: 'Notifications', action: () => isLoggedIn ? useAppStore.getState().setNotifOpen(true) : openAuth('login'), color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500/10' },
     { icon: Globe, label: 'Language & Region', action: () => toast.info('Language settings'), color: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-500/10' },
     { icon: Shield, label: t(language, 'security'), action: () => toast.info('Security settings'), color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-500/10' },
     { icon: Settings, label: t(language, 'accountSettings'), action: () => toast.info('Settings opened'), color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-500/10' },
@@ -37,21 +45,37 @@ export function ProfileView() {
         <div className="relative z-10 flex items-center gap-4">
           <div className="relative">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md text-2xl font-black">
-              AB
+              {isLoggedIn ? initials : <UserIcon className="h-7 w-7" />}
             </div>
-            <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full gradient-gold text-[10px] font-bold text-white shadow-glow-gold">
-              <Crown className="h-3 w-3" />
-            </span>
+            {isLoggedIn && (
+              <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full gradient-gold text-[10px] font-bold text-white shadow-glow-gold">
+                <Crown className="h-3 w-3" />
+              </span>
+            )}
           </div>
           <div className="flex-1">
-            <h2 className="text-xl font-black">Abebe Bekele</h2>
-            <p className="text-sm text-white/85">+251 911 234 567</p>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold">
-                <Crown className="h-2.5 w-2.5" /> GOLD MEMBER
-              </span>
-              <span className="text-[10px] text-white/80">since 2023</span>
-            </div>
+            {isLoggedIn ? (
+              <>
+                <h2 className="text-xl font-black">{userName}</h2>
+                <p className="text-sm text-white/85">{userEmail}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold">
+                    <Crown className="h-2.5 w-2.5" /> {userRole}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-black">Welcome to Gulit.shop</h2>
+                <p className="text-sm text-white/85">Sign in to access your account, orders, and wishlist</p>
+                <button
+                  onClick={() => openAuth('login')}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-xs font-bold text-primary tap-highlight-none"
+                >
+                  <UserIcon className="h-3.5 w-3.5" /> Sign In / Register
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -223,12 +247,17 @@ export function ProfileView() {
       </button>
 
       {/* Logout */}
-      <button
-        onClick={() => toast.info('Logout clicked')}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-destructive/10 py-3 font-semibold text-destructive tap-highlight-none hover:bg-destructive/20 transition-colors"
-      >
-        <LogOut className="h-4 w-4" /> Logout
-      </button>
+      {isLoggedIn && (
+        <button
+          onClick={() => {
+            signOut({ callbackUrl: '/' })
+            toast.success('Signed out successfully')
+          }}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-destructive/10 py-3 font-semibold text-destructive tap-highlight-none hover:bg-destructive/20 transition-colors"
+        >
+          <LogOut className="h-4 w-4" /> Logout
+        </button>
+      )}
 
       {/* Version */}
       <div className="text-center text-xs text-muted-foreground">

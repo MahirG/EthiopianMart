@@ -20,7 +20,7 @@ const itemVariants = {
 }
 
 export function CartView() {
-  const { language, cart, updateQty, removeFromCart, cartTotal, clearCart, setView, addSavings, appliedCoupon, applyCoupon, removeCoupon } = useAppStore()
+  const { language, cart, updateQty, removeFromCart, cartTotal, clearCart, setView, addSavings, appliedCoupon, applyCoupon, removeCoupon, openAuth } = useAppStore()
 
   // Read step from local state via a workaround — we keep the original logic
   // by storing step in window? No — let's use useState here.
@@ -50,18 +50,46 @@ export function CartView() {
     }
   }
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cart.length === 0) return
+    // Check if user is authenticated
+    const res = await fetch('/api/auth/session')
+    const session = await res.json()
+    if (!session?.user) {
+      toast.info('Please sign in to checkout')
+      openAuth('login')
+      return
+    }
     setStep('address')
   }
 
-  const handlePlaceOrder = () => {
-    addSavings(savings)
-    toast.success('Order placed successfully! 🎉', {
-      description: `You saved ${savings} ETB. Track your delivery in Orders.`,
-    })
-    clearCart()
-    setStep('success')
+  const handlePlaceOrder = async () => {
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentMethod: selectedPayment,
+          couponCode: appliedCoupon?.code,
+          deliveryFee,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to place order')
+      }
+
+      addSavings(savings)
+      toast.success('Order placed successfully! 🎉', {
+        description: `Order ${data.orderNumber} • You saved ${savings} ETB`,
+      })
+      clearCart()
+      setStep('success')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to place order')
+    }
   }
 
   if (step === 'success') {

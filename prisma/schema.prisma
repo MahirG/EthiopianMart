@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Gulit.shop — Production E-commerce Schema
+// Learn more: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -13,20 +10,245 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ==================== USER & AUTH ====================
+
 model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  phone         String?
+  role          String    @default("USER") // USER | VENDOR | ADMIN
+  avatar        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  addresses     Address[]
+  cart          Cart?
+  orders        Order[]
+  reviews       Review[]
+  wishlistItems WishlistItem[]
+  notifications Notification[]
+  products      Product[] // vendor's products
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ==================== CATALOG ====================
+
+model Category {
+  id           String    @id @default(cuid())
+  name         String
+  slug         String    @unique
+  icon         String    @default("📦")
+  color        String    @default("from-blue-500 to-indigo-600")
+  description  String?
+  parentId     String?
+  parent       Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children     Category[] @relation("CategoryHierarchy")
+  products     Product[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Product {
+  id            String      @id @default(cuid())
+  name          String
+  slug          String      @unique
+  description   String
+  price         Float
+  originalPrice Float?
+  currency      String      @default("ETB")
+  sku           String      @unique
+  stock         Int         @default(0)
+  lowStockThreshold Int     @default(5)
+  images        String      @default("[]") // JSON array of image URLs/emojis
+  categoryIcon  String      @default("📦")
+  tags          String      @default("[]") // JSON array
+  isLocal       Boolean     @default(false)
+  isOrganic     Boolean     @default(false)
+  isHandmade    Boolean     @default(false)
+  isActive      Boolean     @default(true)
+  isFeatured    Boolean     @default(false)
+  isBestseller  Boolean     @default(false)
+  rating        Float       @default(0)
+  reviewCount   Int         @default(0)
+  deliveryDays  Int         @default(3)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // Relations
+  categoryId    String
+  category      Category    @relation(fields: [categoryId], references: [id])
+  vendorId      String?
+  vendor        User?       @relation(fields: [vendorId], references: [id])
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+  reviews       Review[]
+  wishlistItems WishlistItem[]
+}
+
+// ==================== CART & CHECKOUT ====================
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
   id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName  String
+  phone     String
+  city      String
+  area      String
+  details   String
+  isDefault Boolean  @default(false)
+  orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Post {
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  addressId       String?
+  address         Address?    @relation(fields: [addressId], references: [id])
+  subtotal        Float
+  deliveryFee     Float       @default(0)
+  discount        Float       @default(0)
+  total           Float
+  status          String      @default("PLACED") // PLACED | CONFIRMED | PACKING | ON_THE_WAY | DELIVERED | CANCELLED
+  paymentMethod   String      @default("TELEBIRR")
+  paymentStatus   String      @default("PENDING") // PENDING | PAID | FAILED | REFUNDED
+  couponCode      String?
+  driverName      String?
+  driverPhone     String?
+  driverRating    Float?
+  driverVehicle   String?
+  eta             String?
+  progress        Int         @default(0)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model OrderItem {
   id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  name      String
+  price     Float
+  quantity  Int
+  image     String
+}
+
+// ==================== ENGAGEMENT ====================
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  rating    Int      // 1-5
+  title     String?
+  comment   String
+  verified  Boolean  @default(false)
+  helpful   Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // price_drop | order | flash_sale | new_arrival | wishlist | payment | delivery | savings
+  title     String
+  message   String
+  icon      String   @default("🔔")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// ==================== ANALYTICS (lightweight) ====================
+
+model ProductView {
+  id        String   @id @default(cuid())
+  productId String
+  userId    String?
+  sessionId String?
+  createdAt DateTime @default(now())
 }

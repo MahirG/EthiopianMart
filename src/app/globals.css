@@ -178,11 +178,47 @@
     font-size: clamp(0.875rem, 0.85rem + 0.12vw, 0.95rem);
     line-height: 1.6;
     letter-spacing: -0.011em;
+    /* Prevent overscroll bounce on mobile (iOS) and the rubber-band effect */
+    overscroll-behavior-y: none;
+    /* Prevent text selection on long press for app-like feel (keep on inputs) */
+    -webkit-touch-callout: none;
+    /* Allow momentum scrolling */
+    -webkit-overflow-scrolling: touch;
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    /* Prevent horizontal overflow from animations/gradients */
+    overflow-x: hidden;
+  }
+
+  /* CRITICAL MOBILE FIX: Inputs must be >= 16px on mobile
+     Otherwise iOS Safari auto-zooms the page on focus and the
+     "bad zoom effect" happens. Desktop scales back up via media query. */
+  input, select, textarea {
+    font-size: 16px;
+  }
+  @media (min-width: 768px) {
+    input, select, textarea {
+      font-size: 0.875rem;
+    }
+  }
+
+  /* Prevent the iOS double-tap zoom on buttons */
+  button, a {
+    touch-action: manipulation;
+  }
+
+  /* Remove tap highlight color globally (we provide our own feedback) */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Allow text selection in form fields for editing */
+  input, textarea, select {
+    -webkit-user-select: text;
+    user-select: text;
   }
 
   /* Fluid heading scale — display font */
@@ -585,4 +621,69 @@
 }
 .skip-link:focus {
   top: 1rem;
+}
+
+/* ============================================================
+   TOUCH DEVICE OPTIMIZATIONS
+   On touch devices, hover effects "linger" after a tap (the
+   browser keeps :hover active until the user taps elsewhere).
+   This causes buttons to look stuck/zoomed. We disable hover-
+   driven transforms on coarse-pointer (touch) devices and rely
+   on :active for tactile feedback instead.
+   ============================================================ */
+
+@media (pointer: coarse) {
+  /* Disable hover lift/scale on touch devices */
+  [class*="hover:scale"],
+  [class*="hover:-translate"],
+  [class*="hover:translate"],
+  [class*="group-hover:scale"],
+  [class*="group-hover:translate"],
+  [class*="group-hover:rotate"] {
+    transform: none !important;
+  }
+
+  /* Disable the hover-reveal product card tip on touch —
+     it would stay visible after tap. The info is still
+     accessible on the product detail page. */
+  .group:hover .opacity-0.group-hover\:opacity-100 {
+    opacity: 0 !important;
+  }
+
+  /* Show product card savings tip always on touch (it's useful info) */
+  .group .absolute.bottom-2\.5 {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Larger touch targets — minimum 44px for primary actions */
+  button:not([class*="h-2"]):not([class*="h-3"]):not([class*="h-4"]):not([class*="h-5"]) {
+    min-height: 40px;
+  }
+
+  /* Prevent sticky :hover on nav items */
+  .group:hover {
+    background-color: inherit;
+  }
+}
+
+/* Smooth, non-janky scroll on iOS */
+@supports (-webkit-touch-callout: none) {
+  .scroll-smooth-touch {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+}
+
+/* Prevent pull-to-refresh from interfering with scrollable regions */
+.scrollable-region {
+  overscroll-behavior: contain;
+}
+
+/* Safe-area-aware bottom padding for fixed bars (iPhone X+ notch) */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
 }

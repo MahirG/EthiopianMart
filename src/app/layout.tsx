@@ -52,7 +52,10 @@ export const viewport: Viewport = {
   ],
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
+  // Do NOT set maximumScale or user-scalable=false — iOS Safari ignores it
+  // and Android Chrome mishandles it, causing the "bad zoom" effect on inputs.
+  // Allow native pinch-zoom for accessibility (WCAG 1.4.4).
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

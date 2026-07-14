@@ -157,11 +157,12 @@ export function HomeView() {
               </motion.button>
             </div>
 
-            {/* Big emoji — floating animation */}
+            {/* Big emoji — floating animation, pointer-events-none so it never blocks taps */}
             <motion.div
               animate={{ y: [0, -10, 0], rotate: [0, 4, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute right-6 sm:right-16 top-1/2 -translate-y-1/2 text-8xl sm:text-9xl opacity-90 drop-shadow-2xl"
+              className="absolute right-4 sm:right-16 top-1/2 -translate-y-1/2 text-7xl sm:text-9xl opacity-90 drop-shadow-2xl pointer-events-none select-none"
+              aria-hidden="true"
             >
               {heroSlides[activeSlide].emoji}
             </motion.div>

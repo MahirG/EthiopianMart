@@ -32,14 +32,14 @@ export function ProductCard({ product, compact = false, index = 0 }: ProductCard
       whileHover={{ y: -6, transition: { type: 'spring', stiffness: 400, damping: 25 } }}
       whileTap={{ scale: 0.98 }}
       onClick={() => setSelectedProduct(product)}
-      className="group relative cursor-pointer overflow-hidden rounded-2xl glass tap-highlight-none transition-shadow hover:shadow-float"
+      className="group relative cursor-pointer overflow-hidden rounded-2xl glass tap-highlight-none transition-shadow md:hover:shadow-float"
     >
       {/* Image area */}
       <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-accent/40 via-muted to-accent/30">
-        {/* Dynamic lighting overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+        {/* Dynamic lighting overlay — subtle, no hover change on touch */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent opacity-60 pointer-events-none" />
 
-        <div className="absolute inset-0 flex items-center justify-center text-6xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-700 ease-out-soft">
+        <div className="absolute inset-0 flex items-center justify-center text-6xl transition-transform duration-500 ease-out-soft group-active:scale-110 md:group-hover:scale-110">
           {product.categoryIcon}
         </div>
 
@@ -69,7 +69,7 @@ export function ProductCard({ product, compact = false, index = 0 }: ProductCard
             e.stopPropagation()
             toggleWishlist(product.id)
           }}
-          className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full glass-strong tap-highlight-none transition-shadow hover:shadow-sm"
+          className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full glass-strong tap-highlight-none transition-shadow md:hover:shadow-sm"
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
           <motion.span
@@ -80,15 +80,15 @@ export function ProductCard({ product, compact = false, index = 0 }: ProductCard
           </motion.span>
         </motion.button>
 
-        {/* AI savings tip — slides up on hover */}
-        <div className="absolute bottom-2.5 left-2.5 right-2.5 translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out-soft">
-          {product.bundleSavings && (
+        {/* AI savings tip — always visible on mobile (hover on desktop) */}
+        {product.bundleSavings && (
+          <div className="absolute bottom-2.5 left-2.5 right-2.5 opacity-100 md:translate-y-1 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 transition-all duration-300 ease-out-soft">
             <div className="flex items-center gap-1.5 rounded-xl glass-strong px-2.5 py-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
               <Sparkles className="h-3 w-3 shrink-0" />
               <span className="truncate">Save {product.bundleSavings} Birr</span>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -134,10 +134,9 @@ export function ProductCard({ product, compact = false, index = 0 }: ProductCard
           </div>
           <motion.button
             whileTap={{ scale: 0.9 }}
-            whileHover={{ scale: 1.08 }}
             transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             onClick={handleAdd}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl gradient-emerald text-primary-foreground shadow-glow tap-highlight-none"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl gradient-emerald text-primary-foreground shadow-glow tap-highlight-none md:hover:scale-108"
             aria-label={`Add ${product.name} to cart`}
           >
             <Plus className="h-4 w-4" strokeWidth={2.5} />

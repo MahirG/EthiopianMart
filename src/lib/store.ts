@@ -59,7 +59,7 @@ interface AppState {
 
 const initialAssistantMessage: ChatMessage = {
   id: 'm0', role: 'assistant',
-  content: 'Selam! 👋 I\'m your AI shopping assistant. I can help you find the best deals, compare products, plan your budget, and save money. Try asking me anything — in Amharic, Oromo, English, or any language you prefer!',
+  content: 'Hello! 👋 I\'m your Gulit.shop AI assistant. I can help you find the best deals, compare products, plan your budget, and save money. Try asking me anything — in any language you prefer!',
   timestamp: new Date().toISOString(),
   suggestions: aiQuickPrompts.slice(0, 4),
 }
@@ -165,7 +165,7 @@ export const useAppStore = create<AppState>()(
       addSavings: (amt) => set((s) => ({ savedTotal: s.savedTotal + amt })),
     }),
     {
-      name: 'gebeya-store',
+      name: 'gulit-shop-store',
       partialize: (s) => ({
         theme: s.theme, language: s.language, cart: s.cart,
         wishlist: s.wishlist, savedTotal: s.savedTotal,

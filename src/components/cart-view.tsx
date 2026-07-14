@@ -89,7 +89,7 @@ export function CartView() {
           transition={{ delay: 0.3 }}
           className="text-muted-foreground mb-1"
         >
-          Thank you for shopping with Gebeya
+          Thank you for shopping with Gulit.shop
         </motion.p>
         <motion.p
           initial={{ opacity: 0, y: 10 }}

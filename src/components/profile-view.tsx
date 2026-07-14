@@ -232,7 +232,7 @@ export function ProfileView() {
 
       {/* Version */}
       <div className="text-center text-xs text-muted-foreground">
-        Gebeya v1.0.0 • Made with ❤️ in Ethiopia 🇪🇹
+        Gulit.shop v1.0.0 • Made with ❤️ for Africa 🌍
       </div>
     </div>
   )

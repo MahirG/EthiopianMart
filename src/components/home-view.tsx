@@ -13,10 +13,10 @@ import { useState, useEffect } from 'react'
 
 const heroSlides = [
   {
-    title: 'Mega Ethiopian Sale',
-    subtitle: 'Up to 40% off on local products',
+    title: 'Mega Sale Event',
+    subtitle: 'Up to 40% off on top products',
     cta: 'Shop Deals',
-    gradient: 'from-emerald-600 via-teal-600 to-green-700',
+    gradient: 'from-blue-600 via-blue-700 to-indigo-700',
     emoji: '🛍️',
     badge: 'Limited Time',
   },
@@ -24,7 +24,7 @@ const heroSlides = [
     title: 'Fresh Yirgacheffe Coffee',
     subtitle: 'Direct from farmers, save 23%',
     cta: 'Buy Coffee',
-    gradient: 'from-amber-600 via-orange-600 to-red-600',
+    gradient: 'from-orange-500 via-orange-600 to-red-500',
     emoji: '☕',
     badge: 'Just Arrived',
   },
@@ -32,7 +32,7 @@ const heroSlides = [
     title: 'Tech Festival',
     subtitle: 'Samsung, JBL & more — lowest prices',
     cta: 'Shop Electronics',
-    gradient: 'from-violet-600 via-purple-600 to-fuchsia-600',
+    gradient: 'from-blue-600 via-violet-600 to-purple-600',
     emoji: '📱',
     badge: 'Flash Sale',
   },
@@ -334,7 +334,7 @@ export function HomeView() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-50px' }}
         transition={{ duration: 0.6 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 p-6 sm:p-8 text-white shadow-float"
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 p-6 sm:p-8 text-white shadow-float"
       >
         <motion.div
           animate={{ rotate: [0, 5, 0] }}
@@ -346,7 +346,7 @@ export function HomeView() {
         <div className="relative z-10 max-w-lg">
           <div className="flex items-center gap-2 mb-2">
             <Crown className="h-5 w-5" />
-            <span className="text-sm font-bold uppercase tracking-wide">Gebeya Membership</span>
+            <span className="text-sm font-bold uppercase tracking-wide">Gulit.shop Membership</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black mb-2 font-display tracking-tight text-balance">Unlock Premium Savings</h2>
           <p className="text-white/90 mb-4">Free delivery, 20% cashback, exclusive deals & VIP AI concierge.</p>
@@ -361,7 +361,7 @@ export function HomeView() {
             whileTap={{ scale: 0.97 }}
             whileHover={{ scale: 1.03 }}
             onClick={() => setView('profile')}
-            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-purple-700 shadow-xl tap-highlight-none"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-blue-700 shadow-xl tap-highlight-none"
           >
             <Crown className="h-4 w-4" /> {t(language, 'joinNow')} — from 299 ETB{t(language, 'perMonth')}
           </motion.button>
@@ -546,7 +546,7 @@ export function HomeView() {
 
       {/* Stats footer */}
       <section className="rounded-3xl gradient-mesh p-6 sm:p-8 text-center">
-        <h3 className="text-lg font-black mb-4 font-display tracking-tight">{t(language, 'trustedBy')} millions of Ethiopians</h3>
+        <h3 className="text-lg font-black mb-4 font-display tracking-tight">{t(language, 'trustedBy')} millions of happy shoppers</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { value: '2.4M+', label: t(language, 'happyShoppers') },

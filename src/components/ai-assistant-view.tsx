@@ -54,7 +54,7 @@ export function AIAssistantView() {
               <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-300 border-2 border-emerald-600" />
             </div>
             <div>
-              <h1 className="text-xl font-black">Gebeya AI Assistant</h1>
+              <h1 className="text-xl font-black">Gulit.shop AI Assistant</h1>
               <p className="text-sm text-white/85">Your intelligent shopping companion • Speaks 5 languages</p>
             </div>
           </div>

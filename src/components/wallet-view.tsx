@@ -43,7 +43,7 @@ export function WalletView() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Wallet className="h-5 w-5" />
-              <span className="text-sm font-semibold uppercase tracking-wide">Gebeya Wallet</span>
+              <span className="text-sm font-semibold uppercase tracking-wide">Gulit.shop Wallet</span>
             </div>
             <span className="text-xs bg-white/20 backdrop-blur-md px-2 py-1 rounded-full font-bold">PREMIUM</span>
           </div>
@@ -132,7 +132,7 @@ export function WalletView() {
         <div>
           <div className="font-bold text-sm">AI Insight</div>
           <p className="text-sm text-muted-foreground mt-0.5">
-            You've saved 8,450 ETB this year! Use Gebeya Wallet for payments to earn an extra 5% cashback on every order.
+            You've saved 8,450 ETB this year! Use Gulit.shop Wallet for payments to earn an extra 5% cashback on every order.
           </p>
         </div>
       </div>

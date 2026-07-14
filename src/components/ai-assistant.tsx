@@ -67,7 +67,7 @@ export function AIAssistant() {
                   <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-300 border-2 border-emerald-600" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-sm font-display tracking-tight">Gebeya AI Assistant</h2>
+                  <h2 className="font-bold text-sm font-display tracking-tight">Gulit.shop AI Assistant</h2>
                   <p className="text-xs text-white/80">Online • Speaks 5 languages</p>
                 </div>
               </div>

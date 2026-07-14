@@ -27,7 +27,7 @@ export function BottomNav() {
           whileHover={{ scale: 1.05 }}
           onClick={() => setView('home')}
           className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl gradient-ethiopian text-white shadow-glow"
-          aria-label="Gebeya home"
+          aria-label="Gulit.shop home"
         >
           <span className="text-xl font-black font-display">G</span>
         </motion.button>

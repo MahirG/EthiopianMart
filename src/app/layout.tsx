@@ -26,20 +26,20 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Gebeya — Ethiopia's Shopping & Savings Super App",
-  description: "Shop millions of products, compare prices, save money with AI, and pay your way — Ethiopia's most advanced shopping platform. Built for every Ethiopian.",
-  keywords: ["Ethiopia shopping", "Gebeya", "Addis Ababa", "Telebirr", "Ethiopian commerce", "online shopping Ethiopia", "AI shopping assistant"],
-  authors: [{ name: "Gebeya" }],
+  title: "Gulit.shop — Africa's Trusted Online Shopping Destination",
+  description: "Shop millions of products with confidence. Fast delivery, secure payments, and the best prices. Gulit.shop makes online shopping simple, trusted, fast, and enjoyable for everyone.",
+  keywords: ["Gulit.shop", "online shopping", "Africa shopping", "Ethiopia shopping", "Addis Ababa", "Telebirr", "e-commerce Africa", "AI shopping assistant"],
+  authors: [{ name: "Gulit.shop" }],
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Gebeya",
+    title: "Gulit.shop",
   },
   openGraph: {
-    title: "Gebeya — Ethiopia's Shopping & Savings Super App",
-    description: "Shop smart, save more. The premium shopping experience built for Ethiopia.",
-    siteName: "Gebeya",
+    title: "Gulit.shop — Africa's Trusted Online Shopping Destination",
+    description: "Shop smart, save more. Simple, trusted, fast online shopping for everyone.",
+    siteName: "Gulit.shop",
     type: "website",
     locale: "en_US",
   },
@@ -47,8 +47,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fcfdfb" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a1410" },
+    { media: "(prefers-color-scheme: light)", color: "#F8FAFC" },
+    { media: "(prefers-color-scheme: dark)", color: "#0F172A" },
   ],
   width: "device-width",
   initialScale: 1,

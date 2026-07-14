@@ -70,14 +70,14 @@ export function Header() {
             whileTap={{ scale: 0.95 }}
             onClick={() => setView('home')}
             className="flex items-center gap-2 tap-highlight-none"
-            aria-label="Gebeya home"
+            aria-label="Gulit.shop home"
           >
             <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-ethiopian text-white shadow-glow">
               <span className="text-base font-black">G</span>
             </div>
             <div className="hidden sm:block">
-              <div className="text-base font-black leading-none text-gradient-emerald font-display tracking-tight">Gebeya</div>
-              <div className="text-[10px] text-muted-foreground leading-none mt-0.5">Ethiopia's Super App</div>
+              <div className="text-base font-black leading-none text-gradient-emerald font-display tracking-tight">Gulit.shop</div>
+              <div className="text-[10px] text-muted-foreground leading-none mt-0.5">Shop Smart, Save More</div>
             </div>
           </motion.button>
 

@@ -324,7 +324,7 @@ export function AdminView() {
               <Sparkles className="h-5 w-5" />
               <h3 className="font-bold">AI Engine Status</h3>
             </div>
-            <p className="text-sm text-white/90">Gebeya AI is running optimally across all modules</p>
+            <p className="text-sm text-white/90">Gulit.shop AI is running optimally across all modules</p>
           </div>
 
           {[

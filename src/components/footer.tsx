@@ -14,7 +14,7 @@ const footerLinks = {
   Account: ['My Orders', 'Wishlist', 'Addresses', 'Membership', 'Wallet'],
   Sell: ['Become a Vendor', 'Vendor Dashboard', 'Seller AI Tools', 'Pricing', 'Success Stories'],
   Help: ['Help Center', 'Track Order', 'Returns & Refunds', 'Contact Us', 'FAQs'],
-  Company: ['About Gebeya', 'Careers', 'Press', 'Blog', 'Sustainability'],
+  Company: ['About Gulit.shop', 'Careers', 'Press', 'Blog', 'Sustainability'],
 }
 
 const socialIcons = [Facebook, Twitter, Instagram, Youtube]
@@ -83,7 +83,7 @@ export function Footer() {
                 Get exclusive deals & early access
               </h2>
               <p className="text-white/90 text-sm">
-                Join 2.4M+ Ethiopians saving money with Gebeya. Receive personalized offers, flash sale alerts, and AI-powered shopping tips.
+                Join 2.4M+ Ethiopians saving money with Gulit.shop. Receive personalized offers, flash sale alerts, and AI-powered shopping tips.
               </p>
             </div>
             <form onSubmit={handleSubscribe} className="flex gap-2">
@@ -133,12 +133,12 @@ export function Footer() {
                 <span className="text-lg font-black font-display">G</span>
               </div>
               <div>
-                <div className="text-lg font-black font-display tracking-tight text-gradient-emerald">Gebeya</div>
-                <div className="text-[10px] text-muted-foreground">Ethiopia's Super App</div>
+                <div className="text-lg font-black font-display tracking-tight text-gradient-emerald">Gulit.shop</div>
+                <div className="text-[10px] text-muted-foreground">Africa's Trusted Shopping Platform</div>
               </div>
             </button>
             <p className="text-sm text-muted-foreground mb-4 max-w-xs leading-relaxed">
-              Ethiopia&apos;s largest digital commerce ecosystem. Shop millions of products, compare prices, save money with AI, and pay your way.
+              Africa&apos;s trusted online shopping destination. Shop millions of products, compare prices, save money with AI, and pay your way — simple, fast, and enjoyable.
             </p>
             <div className="flex gap-2">
               {socialIcons.map((Icon, i) => (
@@ -189,7 +189,7 @@ export function Footer() {
         <div className="mx-auto max-w-7xl px-4 py-5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="text-xs text-muted-foreground text-center sm:text-left">
-              © 2026 Gebeya. All rights reserved. •{' '}
+              © 2026 Gulit.shop. All rights reserved. •{' '}
               <a href="#" className="hover:text-primary transition-colors">Privacy</a>
               {' • '}
               <a href="#" className="hover:text-primary transition-colors">Terms</a>

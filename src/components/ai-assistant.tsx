@@ -21,6 +21,10 @@ export function AIAssistant() {
     }
   }, [chatMessages])
 
+  // Derive typing indicator from the last message — no extra state needed
+  const lastMessage = chatMessages[chatMessages.length - 1]
+  const isTyping = lastMessage?.role === 'user'
+
   const handleSend = (text?: string) => {
     const msg = text || input
     if (!msg.trim()) return
@@ -43,15 +47,15 @@ export function AIAssistant() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
             onClick={() => setAiOpen(false)}
           />
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            initial={{ opacity: 0, y: 30, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.98 }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 sm:inset-x-auto sm:right-4 sm:top-4 sm:bottom-4 z-50 mx-auto sm:m-0 w-full sm:w-[440px] flex flex-col rounded-t-3xl sm:rounded-3xl glass-strong shadow-premium overflow-hidden"
+            exit={{ opacity: 0, y: 30, scale: 0.96 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+            className="fixed inset-x-0 bottom-0 sm:inset-x-auto sm:right-4 sm:top-4 sm:bottom-4 z-50 mx-auto sm:m-0 w-full sm:w-[440px] flex flex-col rounded-t-3xl sm:rounded-3xl liquid-glass shadow-elevated overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border/40 gradient-emerald text-primary-foreground">
@@ -63,20 +67,20 @@ export function AIAssistant() {
                   <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-300 border-2 border-emerald-600" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-sm">Gebeya AI Assistant</h2>
+                  <h2 className="font-bold text-sm font-display tracking-tight">Gebeya AI Assistant</h2>
                   <p className="text-xs text-white/80">Online • Speaks 5 languages</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
                 <button
-                  className="rounded-lg p-2 hover:bg-white/15 transition-colors"
+                  className="rounded-lg p-2 hover:bg-white/15 transition-colors tap-highlight-none"
                   aria-label="Clear chat"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => setAiOpen(false)}
-                  className="rounded-lg p-2 hover:bg-white/15 transition-colors"
+                  className="rounded-lg p-2 hover:bg-white/15 transition-colors tap-highlight-none"
                   aria-label="Close chat"
                 >
                   <X className="h-5 w-5" />
@@ -91,6 +95,7 @@ export function AIAssistant() {
                   key={msg.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div className={`max-w-[85%] ${msg.role === 'user' ? '' : 'w-full'}`}>
@@ -103,14 +108,13 @@ export function AIAssistant() {
                     <div
                       className={`rounded-2xl px-4 py-3 text-sm ${
                         msg.role === 'user'
-                          ? 'gradient-emerald text-primary-foreground rounded-br-md'
+                          ? 'gradient-emerald text-primary-foreground rounded-br-md shadow-glow'
                           : 'glass rounded-bl-md'
                       }`}
                     >
                       <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                     </div>
 
-                    {/* Suggestions */}
                     {msg.suggestions && msg.suggestions.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mt-2">
                         {msg.suggestions.map((s, i) => (
@@ -128,23 +132,49 @@ export function AIAssistant() {
                 </motion.div>
               ))}
 
+              {/* Typing indicator */}
+              {isTyping && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex justify-start"
+                >
+                  <div className="glass rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-1.5">
+                    {[0, 1, 2].map((i) => (
+                      <motion.span
+                        key={i}
+                        className="h-2 w-2 rounded-full bg-primary/60"
+                        animate={{ scale: [1, 1.3, 1], opacity: [0.4, 1, 0.4] }}
+                        transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
               {/* Quick prompts (only show at start) */}
-              {chatMessages.length === 1 && (
-                <div className="space-y-2 pt-2">
+              {chatMessages.length === 1 && !isTyping && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="space-y-2 pt-2"
+                >
                   <p className="text-xs font-semibold text-muted-foreground px-1">Try asking:</p>
                   {aiQuickPrompts.map((prompt, i) => (
                     <motion.button
                       key={i}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.1 + i * 0.05 }}
+                      transition={{ delay: 0.4 + i * 0.05 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => handleSend(prompt)}
                       className="w-full text-left rounded-xl glass hover:shadow-premium p-3 transition-all tap-highlight-none group"
                     >
                       <span className="text-sm font-medium group-hover:text-primary transition-colors">{prompt}</span>
                     </motion.button>
                   ))}
-                </div>
+                </motion.div>
               )}
             </div>
 
@@ -155,13 +185,15 @@ export function AIAssistant() {
                 {tools.map((tool, i) => {
                   const Icon = tool.icon
                   return (
-                    <button
+                    <motion.button
                       key={i}
-                      className={`flex h-9 w-9 items-center justify-center rounded-lg ${tool.bg} ${tool.color} transition-transform hover:scale-110 active:scale-95 tap-highlight-none`}
+                      whileTap={{ scale: 0.9 }}
+                      whileHover={{ scale: 1.1 }}
+                      className={`flex h-9 w-9 items-center justify-center rounded-lg ${tool.bg} ${tool.color} transition-transform tap-highlight-none`}
                       aria-label={tool.label}
                     >
                       <Icon className="h-4 w-4" />
-                    </button>
+                    </motion.button>
                   )
                 })}
               </div>
@@ -176,15 +208,18 @@ export function AIAssistant() {
                   onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                   placeholder="Ask anything about shopping..."
                   className="flex-1 bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground"
+                  aria-label="Message AI assistant"
                 />
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.88 }}
+                  whileHover={{ scale: 1.08 }}
                   onClick={() => handleSend()}
                   disabled={!input.trim()}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl gradient-emerald text-primary-foreground shadow-glow disabled:opacity-40 transition-all hover:scale-105 active:scale-95 tap-highlight-none"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl gradient-emerald text-primary-foreground shadow-glow disabled:opacity-40 transition-all tap-highlight-none"
                   aria-label="Send message"
                 >
                   <Send className="h-4 w-4" />
-                </button>
+                </motion.button>
               </div>
             </div>
           </motion.div>

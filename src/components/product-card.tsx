@@ -28,57 +28,67 @@ export function ProductCard({ product, compact = false, index = 0 }: ProductCard
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3) }}
-      whileHover={{ y: -4 }}
+      transition={{ duration: 0.5, delay: Math.min(index * 0.05, 0.3), ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -6, transition: { type: 'spring', stiffness: 400, damping: 25 } }}
+      whileTap={{ scale: 0.98 }}
       onClick={() => setSelectedProduct(product)}
-      className="group relative cursor-pointer overflow-hidden rounded-2xl glass shadow-premium transition-all hover:shadow-glow"
+      className="group relative cursor-pointer overflow-hidden rounded-2xl glass tap-highlight-none transition-shadow hover:shadow-float"
     >
       {/* Image area */}
-      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-accent/50 to-muted">
-        <div className="absolute inset-0 flex items-center justify-center text-6xl group-hover:scale-110 transition-transform duration-500">
+      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-accent/40 via-muted to-accent/30">
+        {/* Dynamic lighting overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+
+        <div className="absolute inset-0 flex items-center justify-center text-6xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-700 ease-out-soft">
           {product.categoryIcon}
         </div>
 
         {/* Badges */}
-        <div className="absolute left-2 top-2 flex flex-col gap-1">
+        <div className="absolute left-2.5 top-2.5 flex flex-col gap-1.5">
           {product.discount && (
-            <span className="rounded-full gradient-gold px-2 py-0.5 text-[10px] font-bold text-white shadow-glow-gold">
-              -{product.discount}%
+            <span className="rounded-full gradient-gold px-2.5 py-0.5 text-[10px] font-bold text-white shadow-glow-gold backdrop-blur-sm">
+              −{product.discount}%
             </span>
           )}
           {product.isLocal && (
-            <span className="rounded-full bg-emerald-600/90 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur">
+            <span className="rounded-full bg-emerald-600/95 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm backdrop-blur-sm">
               🇪🇹 Local
             </span>
           )}
           {product.isHandmade && (
-            <span className="rounded-full bg-amber-700/90 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur">
+            <span className="rounded-full bg-amber-700/95 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm backdrop-blur-sm">
               ✋ Handmade
             </span>
           )}
         </div>
 
         {/* Wishlist */}
-        <button
+        <motion.button
+          whileTap={{ scale: 0.85 }}
           onClick={(e) => {
             e.stopPropagation()
             toggleWishlist(product.id)
           }}
-          className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full glass-strong tap-highlight-none"
-          aria-label="Add to wishlist"
+          className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full glass-strong tap-highlight-none transition-shadow hover:shadow-sm"
+          aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
-          <Heart className={`h-4 w-4 transition-all ${isWishlisted ? 'fill-destructive text-destructive' : 'text-foreground'}`} />
-        </button>
+          <motion.span
+            animate={isWishlisted ? { scale: [1, 1.3, 1] } : { scale: 1 }}
+            transition={{ duration: 0.4 }}
+          >
+            <Heart className={`h-4 w-4 transition-colors ${isWishlisted ? 'fill-destructive text-destructive' : 'text-foreground'}`} />
+          </motion.span>
+        </motion.button>
 
-        {/* AI savings tip */}
-        {product.bundleSavings && (
-          <div className="absolute bottom-2 left-2 right-2">
-            <div className="flex items-center gap-1.5 rounded-lg glass-strong px-2 py-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+        {/* AI savings tip — slides up on hover */}
+        <div className="absolute bottom-2.5 left-2.5 right-2.5 translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out-soft">
+          {product.bundleSavings && (
+            <div className="flex items-center gap-1.5 rounded-xl glass-strong px-2.5 py-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
               <Sparkles className="h-3 w-3 shrink-0" />
               <span className="truncate">Save {product.bundleSavings} Birr</span>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Content */}
@@ -90,7 +100,7 @@ export function ProductCard({ product, compact = false, index = 0 }: ProductCard
         </div>
 
         {/* Name */}
-        <h3 className={`font-semibold leading-tight line-clamp-2 ${compact ? 'text-xs' : 'text-sm'}`}>
+        <h3 className={`font-semibold leading-tight line-clamp-2 text-balance ${compact ? 'text-xs' : 'text-sm'}`}>
           {product.name}
         </h3>
 
@@ -110,25 +120,28 @@ export function ProductCard({ product, compact = false, index = 0 }: ProductCard
         </div>
 
         {/* Price */}
-        <div className="flex items-end justify-between gap-2">
-          <div>
+        <div className="flex items-end justify-between gap-2 pt-0.5">
+          <div className="min-w-0">
             <div className="flex items-baseline gap-1">
-              <span className="text-base font-black text-foreground">{product.price.toLocaleString()}</span>
+              <span className="text-base font-black tracking-tight">{product.price.toLocaleString()}</span>
               <span className="text-[10px] font-medium text-muted-foreground">ETB</span>
             </div>
             {product.originalPrice && (
               <span className="text-[11px] text-muted-foreground line-through">
-                {product.originalPrice.toLocaleString()} ETB
+                {product.originalPrice.toLocaleString()}
               </span>
             )}
           </div>
-          <button
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.08 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             onClick={handleAdd}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl gradient-emerald text-primary-foreground shadow-glow tap-highlight-none hover:scale-105 active:scale-95 transition-transform"
-            aria-label="Add to cart"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl gradient-emerald text-primary-foreground shadow-glow tap-highlight-none"
+            aria-label={`Add ${product.name} to cart`}
           >
-            <Plus className="h-4 w-4" />
-          </button>
+            <Plus className="h-4 w-4" strokeWidth={2.5} />
+          </motion.button>
         </div>
 
         {/* AI prediction */}

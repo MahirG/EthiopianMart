@@ -1,18 +1,28 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ScrollProgress } from "@/components/scroll-progress";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-display-sans",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -37,8 +47,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a1a14" },
+    { media: "(prefers-color-scheme: light)", color: "#fcfdfb" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a1410" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -53,12 +63,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground overflow-x-hidden`}
+        className={`${geistSans.variable} ${geistMono.variable} ${jakarta.variable} antialiased bg-background text-foreground overflow-x-hidden`}
       >
+        <a href="#main-content" className="skip-link">Skip to content</a>
         <ThemeProvider>
+          <ScrollProgress />
           {children}
           <Toaster />
-          <SonnerToaster position="top-center" richColors />
+          <SonnerToaster position="top-center" richColors toastOptions={{
+            style: {
+              borderRadius: "var(--radius-lg)",
+              backdropFilter: "blur(20px)",
+            },
+          }} />
         </ThemeProvider>
       </body>
     </html>

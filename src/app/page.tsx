@@ -40,14 +40,17 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col gradient-mesh">
       <Header />
-      <main className="flex-1 w-full mx-auto max-w-7xl px-4 py-6 lg:pl-24 lg:pr-8 pb-24 lg:pb-8">
+      <main
+        id="main-content"
+        className="flex-1 w-full mx-auto max-w-7xl px-3 sm:px-4 py-6 lg:pl-24 lg:pr-8 pb-24 lg:pb-8 scroll-smooth-touch"
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={view}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
             {renderView()}
           </motion.div>

@@ -178,19 +178,25 @@
     font-size: clamp(0.875rem, 0.85rem + 0.12vw, 0.95rem);
     line-height: 1.6;
     letter-spacing: -0.011em;
-    /* Prevent overscroll bounce on mobile (iOS) and the rubber-band effect */
-    overscroll-behavior-y: none;
+    /* Allow normal vertical scrolling — do NOT set overscroll-behavior-y: none
+       on body as it can block scroll on some mobile browsers. Instead, use
+       contain only on specific scrollable regions. */
     /* Prevent text selection on long press for app-like feel (keep on inputs) */
     -webkit-touch-callout: none;
     /* Allow momentum scrolling */
     -webkit-overflow-scrolling: touch;
+    /* Ensure body can grow and scroll naturally */
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
-    /* Prevent horizontal overflow from animations/gradients */
-    overflow-x: hidden;
+    /* Use overflow-x: clip instead of hidden — hidden can create a
+       scroll-container that breaks position: sticky and vertical scroll
+       on some browsers. clip prevents horizontal scroll without side effects. */
+    overflow-x: clip;
   }
 
   /* CRITICAL MOBILE FIX: Inputs must be >= 16px on mobile

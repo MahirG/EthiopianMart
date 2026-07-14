@@ -47,7 +47,7 @@ export default function Home() {
       <Header />
       <main
         id="main-content"
-        className="flex-1 w-full mx-auto max-w-7xl px-3 sm:px-4 py-6 lg:pl-24 lg:pr-8 pb-24 lg:pb-8 scroll-smooth-touch"
+        className="flex-1 w-full mx-auto max-w-7xl px-3 sm:px-4 py-6 lg:pl-24 lg:pr-8 pb-24 lg:pb-8"
       >
         <AnimatePresence mode="wait">
           <motion.div

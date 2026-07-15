@@ -83,6 +83,7 @@ model Category {
   parent       Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children     Category[] @relation("CategoryHierarchy")
   products     Product[]
+  subproducts  Product[] @relation("ProductSubcategory")
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
@@ -92,36 +93,73 @@ model Product {
   name          String
   slug          String      @unique
   description   String
+  shortDescription String?
   price         Float
   originalPrice Float?
+  costPrice     Float?
+  wholesalePrice Float?
+  salePrice     Float?
   currency      String      @default("ETB")
   sku           String      @unique
+  barcode       String?
+  brand         String?
+  manufacturer  String?
+  countryOfOrigin String?
   stock         Int         @default(0)
+  unlimitedStock Boolean    @default(false)
   lowStockThreshold Int     @default(5)
+  warehouseLocation String?
   images        String      @default("[]") // JSON array of image URLs/emojis
+  videos        String      @default("[]") // JSON array of video URLs
   categoryIcon  String      @default("📦")
   tags          String      @default("[]") // JSON array
+  weight        String?
+  dimensions    String?
+  warranty      String?
+  specs         String      @default("[]") // JSON array of {label, value}
   isLocal       Boolean     @default(false)
   isOrganic     Boolean     @default(false)
   isHandmade    Boolean     @default(false)
   isActive      Boolean     @default(true)
+  isPublished   Boolean     @default(true)
+  isArchived    Boolean     @default(false)
   isFeatured    Boolean     @default(false)
   isBestseller  Boolean     @default(false)
   rating        Float       @default(0)
   reviewCount   Int         @default(0)
   deliveryDays  Int         @default(3)
+  // SEO
+  seoTitle      String?
+  seoDescription String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
   // Relations
   categoryId    String
   category      Category    @relation(fields: [categoryId], references: [id])
+  subcategoryId String?
+  subcategory   Category?   @relation("ProductSubcategory", fields: [subcategoryId], references: [id])
   vendorId      String?
   vendor        User?       @relation(fields: [vendorId], references: [id])
+  variants      ProductVariant[]
   cartItems     CartItem[]
   orderItems    OrderItem[]
   reviews       Review[]
   wishlistItems WishlistItem[]
+}
+
+model ProductVariant {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name          String   // e.g. "Color", "Size"
+  value         String   // e.g. "Red", "XL"
+  sku           String?
+  price         Float    @default(0) // override price
+  stock         Int      @default(0)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 // ==================== CART & CHECKOUT ====================

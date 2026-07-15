@@ -564,6 +564,29 @@
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
 
+  /* Premium form input */
+  .input-premium {
+    width: 100%;
+    border-radius: var(--radius-md);
+    background: oklch(0.95 0.006 250 / 0.5);
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    outline: none;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+  }
+  .input-premium:focus {
+    background: oklch(0.95 0.006 250 / 0.8);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px oklch(0.55 0.18 260 / 0.15);
+  }
+  .dark .input-premium {
+    background: oklch(1 0 0 / 0.08);
+  }
+  .dark .input-premium:focus {
+    background: oklch(1 0 0 / 0.12);
+  }
+
   /* Content-visibility for performance */
   .cv-auto {
     content-visibility: auto;

@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Mail, Lock, User, Phone, Loader2, Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
+import { useAppStore } from '@/lib/store'
 
 interface AuthModalProps {
   open: boolean
@@ -57,6 +58,27 @@ export function AuthModal({ open, onClose, mode: initialMode, onSuccess }: AuthM
       }
 
       toast.success(mode === 'register' ? 'Welcome to Gulit.shop! 🎉' : 'Welcome back! 👋')
+
+      // Fetch session to determine role and redirect accordingly
+      try {
+        const sessionRes = await fetch('/api/auth/session')
+        const session = await sessionRes.json()
+        const role = session?.user?.role
+
+        // Redirect based on role
+        if (role === 'ADMIN') {
+          useAppStore.getState().setView('admin')
+          toast.info('Redirecting to Admin Dashboard...')
+        } else if (role === 'VENDOR') {
+          useAppStore.getState().setView('vendor')
+          toast.info('Redirecting to Vendor Dashboard...')
+        } else {
+          useAppStore.getState().setView('home')
+        }
+      } catch {
+        // If session fetch fails, just stay on current view
+      }
+
       onSuccess?.()
       onClose()
       setFormData({ name: '', email: '', password: '', phone: '' })

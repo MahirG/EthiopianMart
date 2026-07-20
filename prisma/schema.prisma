@@ -1,4 +1,4 @@
-// Gulit.shop — Production E-commerce Schema
+// EthiopianMart — Production E-commerce Schema
 // Learn more: https://pris.ly/d/prisma-schema
 
 generator client {

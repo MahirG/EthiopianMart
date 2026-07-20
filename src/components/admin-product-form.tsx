@@ -8,7 +8,6 @@ import {
   Copy, Check,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { categories } from '@/lib/data'
 
 interface ProductFormModalProps {
   open: boolean
@@ -39,6 +38,7 @@ export function ProductFormModal({ open, onClose, product, onSaved }: ProductFor
   const [specs, setSpecs] = useState<Spec[]>([])
   const [tags, setTags] = useState<string[]>([])
   const [tagInput, setTagInput] = useState('')
+  const [catalogCategories, setCatalogCategories] = useState<Array<{ id: string; name: string }>>([])
 
   // Form state
   const [formData, setFormData] = useState({
@@ -79,6 +79,9 @@ export function ProductFormModal({ open, onClose, product, onSaved }: ProductFor
 
   // Load product data when editing
   useEffect(() => {
+    let cancelled = false
+    queueMicrotask(() => {
+    if (cancelled) return
     if (product) {
       setFormData({
         name: (product.name as string) || '',
@@ -143,7 +146,17 @@ export function ProductFormModal({ open, onClose, product, onSaved }: ProductFor
       setSpecs([])
       setTags([])
     }
+    })
+    return () => { cancelled = true }
   }, [product])
+
+  useEffect(() => {
+    if (!open) return
+    fetch('/api/categories')
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error('Failed to load categories')))
+      .then((data) => setCatalogCategories(data))
+      .catch(() => toast.error('Categories could not be loaded'))
+  }, [open])
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -328,7 +341,7 @@ export function ProductFormModal({ open, onClose, product, onSaved }: ProductFor
                           className="input-premium"
                         >
                           <option value="">Select category</option>
-                          {categories.map((c) => (
+                          {catalogCategories.map((c) => (
                             <option key={c.id} value={c.id}>{c.name}</option>
                           ))}
                         </select>
@@ -810,7 +823,7 @@ export function ProductFormModal({ open, onClose, product, onSaved }: ProductFor
                     <div className="rounded-xl glass p-4">
                       <h4 className="font-bold text-sm mb-2">Search Preview</h4>
                       <div className="bg-background rounded-lg p-3">
-                        <div className="text-xs text-emerald-600 dark:text-emerald-400 mb-0.5">gulit.shop</div>
+                        <div className="text-xs text-emerald-600 dark:text-emerald-400 mb-0.5">ethiopianmart.local</div>
                         <div className="text-blue-600 dark:text-blue-400 text-sm font-medium mb-1 truncate">
                           {formData.seoTitle || formData.name || 'Product Title'}
                         </div>

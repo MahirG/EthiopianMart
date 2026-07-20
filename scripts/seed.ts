@@ -1,17 +1,21 @@
 import { db } from '../src/lib/db'
 import bcrypt from 'bcryptjs'
+import { randomBytes } from 'node:crypto'
 
 async function main() {
   console.log('🌱 Seeding database...')
 
   // Create admin user
-  const adminPassword = await bcrypt.hash('admin123', 12)
+  const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@ethiopianmart.local'
+  const vendorEmail = process.env.SEED_VENDOR_EMAIL || 'vendor@ethiopianmart.local'
+  const userEmail = process.env.SEED_USER_EMAIL || 'shopper@ethiopianmart.local'
+  const adminPassword = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD || randomBytes(24).toString('base64url'), 12)
   const admin = await db.user.upsert({
-    where: { email: 'admin@gulit.shop' },
+    where: { email: adminEmail },
     update: {},
     create: {
       name: 'Admin User',
-      email: 'admin@gulit.shop',
+      email: adminEmail,
       passwordHash: adminPassword,
       role: 'ADMIN',
       phone: '+251911000001',
@@ -19,13 +23,13 @@ async function main() {
   })
 
   // Create vendor user
-  const vendorPassword = await bcrypt.hash('vendor123', 12)
+  const vendorPassword = await bcrypt.hash(process.env.SEED_VENDOR_PASSWORD || randomBytes(24).toString('base64url'), 12)
   const vendor = await db.user.upsert({
-    where: { email: 'vendor@gulit.shop' },
+    where: { email: vendorEmail },
     update: {},
     create: {
       name: 'TechHub Addis',
-      email: 'vendor@gulit.shop',
+      email: vendorEmail,
       passwordHash: vendorPassword,
       role: 'VENDOR',
       phone: '+251911000002',
@@ -33,13 +37,13 @@ async function main() {
   })
 
   // Create regular user
-  const userPassword = await bcrypt.hash('user123', 12)
+  const userPassword = await bcrypt.hash(process.env.SEED_USER_PASSWORD || randomBytes(24).toString('base64url'), 12)
   const regularUser = await db.user.upsert({
-    where: { email: 'user@gulit.shop' },
+    where: { email: userEmail },
     update: {},
     create: {
       name: 'Abebe Bekele',
-      email: 'user@gulit.shop',
+      email: userEmail,
       passwordHash: userPassword,
       role: 'USER',
       phone: '+251911234567',
@@ -249,12 +253,7 @@ async function main() {
   }
 
   console.log('🎉 Seed completed successfully!')
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-  console.log('📋 Login Credentials:')
-  console.log('  Admin:   admin@gulit.shop / admin123')
-  console.log('  Vendor:  vendor@gulit.shop / vendor123')
-  console.log('  User:    user@gulit.shop / user123')
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+  console.log('Seed account passwords are controlled through environment variables and are not printed.')
 }
 
 main()

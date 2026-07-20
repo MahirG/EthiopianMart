@@ -1,20 +1,13 @@
-<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title">
+  <title id="title">EthiopianMart</title>
   <defs>
-    <linearGradient id="gulitGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2563EB"/>
-      <stop offset="100%" stop-color="#1D4ED8"/>
-    </linearGradient>
-    <linearGradient id="gulitAccent" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#F97316"/>
-      <stop offset="100%" stop-color="#EA580C"/>
-    </linearGradient>
+    <clipPath id="round"><rect width="120" height="120" rx="30"/></clipPath>
   </defs>
-  <!-- Rounded square background -->
-  <rect width="120" height="120" rx="28" fill="url(#gulitGradient)"/>
-  <!-- Shopping bag icon formed by G letter -->
-  <path d="M38 45 C38 38 44 32 60 32 C76 32 82 38 82 45 L82 78 C82 85 76 90 60 90 C44 90 38 85 38 78 Z" fill="none" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Bag handle -->
-  <path d="M48 45 C48 35 52 30 60 30 C68 30 72 35 72 45" fill="none" stroke="white" stroke-width="4.5" stroke-linecap="round"/>
-  <!-- Orange accent dot (shopping/energy) -->
-  <circle cx="84" cy="36" r="8" fill="url(#gulitAccent)"/>
+  <g clip-path="url(#round)">
+    <rect width="120" height="120" fill="#0f5132"/>
+    <path d="M-20 42 62-8h35L-4 56Z" fill="#f3c64d"/>
+    <path d="M8 112 140 31v24L33 120H8Z" fill="#c84a34"/>
+    <path d="M37 42 60 29l23 13v36L60 91 37 78V42Z" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round"/>
+    <path d="m46 49 14 8 14-8M60 57v19" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
 </svg>

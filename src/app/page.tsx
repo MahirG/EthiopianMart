@@ -1,74 +1,56 @@
 'use client'
 
+import { AnimatePresence, motion } from 'framer-motion'
 import { useAppStore } from '@/lib/store'
 import { Header } from '@/components/header'
 import { BottomNav } from '@/components/bottom-nav'
 import { Footer } from '@/components/footer'
-import { NotificationsPanel } from '@/components/notifications-panel'
-import { AIAssistant } from '@/components/ai-assistant'
-import { FloatingAIButton } from '@/components/floating-ai-button'
-import { QuickViewModal } from '@/components/quick-view-modal'
 import { AuthModal } from '@/components/auth-modal'
 import { HomeView } from '@/components/home-view'
 import { SearchView } from '@/components/search-view'
 import { CartView } from '@/components/cart-view'
 import { OrdersView } from '@/components/orders-view'
-import { WalletView } from '@/components/wallet-view'
 import { ProfileView } from '@/components/profile-view'
 import { VendorView } from '@/components/vendor-view'
 import { AdminView } from '@/components/admin-view'
 import { ProductDetailView } from '@/components/product-detail-view'
-import { AIAssistantView } from '@/components/ai-assistant-view'
-import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Home() {
   const { view, authModalOpen, authMode, closeAuth } = useAppStore()
 
   const renderView = () => {
     switch (view) {
-      case 'home': return <HomeView />
       case 'search': return <SearchView />
       case 'cart': return <CartView />
       case 'orders': return <OrdersView />
-      case 'wallet': return <WalletView />
       case 'profile': return <ProfileView />
       case 'vendor': return <VendorView />
       case 'admin': return <AdminView />
       case 'product': return <ProductDetailView />
-      case 'ai': return <AIAssistantView />
       default: return <HomeView />
     }
   }
 
-  // Views that should show the footer (main shopping views, not modals/dashboards)
   const showFooter = ['home', 'search', 'cart', 'orders', 'profile'].includes(view)
 
   return (
-    <div className="min-h-screen flex flex-col gradient-mesh">
+    <div className="min-h-screen bg-background">
       <Header />
-      <main
-        id="main-content"
-        className="flex-1 w-full mx-auto max-w-7xl px-3 sm:px-4 py-6 lg:pl-24 lg:pr-8 pb-24 lg:pb-8"
-      >
+      <main id="main-content" className="mx-auto w-full max-w-[1440px] px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-12">
         <AnimatePresence mode="wait">
           <motion.div
             key={view}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
           >
             {renderView()}
           </motion.div>
         </AnimatePresence>
       </main>
-
       {showFooter && <Footer />}
       <BottomNav />
-      <FloatingAIButton />
-      <NotificationsPanel />
-      <AIAssistant />
-      <QuickViewModal />
       <AuthModal open={authModalOpen} onClose={closeAuth} mode={authMode} />
     </div>
   )

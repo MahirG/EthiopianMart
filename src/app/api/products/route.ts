@@ -189,8 +189,8 @@ export async function POST(req: Request) {
             name: v.name,
             value: v.value,
             sku: v.sku || null,
-            price: v.price ? parseFloat(v.price) : 0,
-            stock: v.stock ? parseInt(v.stock) : 0,
+            price: v.price ? Number(v.price) : 0,
+            stock: v.stock ? Number(v.stock) : 0,
             image: v.image || null,
           }))
         } : undefined,

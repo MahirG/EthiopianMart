@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   GEBEYA 2026 DESIGN SYSTEM
+   ETHIOPIANMART DESIGN SYSTEM
    A flagship-grade design language: liquid glass, soft depth,
    dynamic lighting, fluid typography, accessible by default.
    ============================================================ */
@@ -12,9 +12,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-display: var(--font-display-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Plus Jakarta Sans Fallback", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -57,29 +57,27 @@
   /* Refined radius for 2026 — slightly larger, more generous */
   --radius: 1rem;
 
-  /* Light: clean slate-white (#F8FAFC) — premium, minimal */
-  --background: oklch(0.98 0.003 250);
-  --foreground: oklch(0.21 0.02 260);       /* #0F172A */
+  /* Warm neutrals and deep Ethiopian green */
+  --background: oklch(0.975 0.008 88);
+  --foreground: oklch(0.23 0.035 155);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.02 260);
+  --card-foreground: oklch(0.23 0.035 155);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.02 260);
+  --popover-foreground: oklch(0.23 0.035 155);
 
-  /* Royal Blue primary (#2563EB) — trust, technology, reliability */
-  --primary: oklch(0.55 0.18 260);
+  --primary: oklch(0.42 0.12 155);
   --primary-foreground: oklch(0.99 0.003 250);
 
-  /* Premium Orange secondary (#F97316) — shopping, excitement, energy */
-  --secondary: oklch(0.96 0.012 250);
-  --secondary-foreground: oklch(0.55 0.18 260);
-  --muted: oklch(0.96 0.006 250);
-  --muted-foreground: oklch(0.52 0.015 255);
-  --accent: oklch(0.95 0.02 45);             /* warm orange tint */
-  --accent-foreground: oklch(0.25 0.05 40);  /* #F97316 dark */
+  --secondary: oklch(0.955 0.02 88);
+  --secondary-foreground: oklch(0.28 0.06 155);
+  --muted: oklch(0.945 0.012 88);
+  --muted-foreground: oklch(0.50 0.025 155);
+  --accent: oklch(0.93 0.045 82);
+  --accent-foreground: oklch(0.28 0.06 155);
   --destructive: oklch(0.58 0.22 27);        /* #EF4444 */
-  --border: oklch(0.92 0.006 250);
-  --input: oklch(0.94 0.006 250);
-  --ring: oklch(0.55 0.18 260);
+  --border: oklch(0.89 0.015 88);
+  --input: oklch(0.91 0.015 88);
+  --ring: oklch(0.42 0.12 155);
 
   --chart-1: oklch(0.55 0.18 260);  /* Royal Blue */
   --chart-2: oklch(0.70 0.17 45);   /* Premium Orange */
@@ -115,7 +113,7 @@
   --popover: oklch(0.22 0.018 260);
   --popover-foreground: oklch(0.97 0.003 250);
 
-  --primary: oklch(0.65 0.18 260);          /* brighter blue for dark */
+  --primary: oklch(0.70 0.14 152);
   --primary-foreground: oklch(0.15 0.015 260);
 
   --secondary: oklch(0.26 0.018 260);
@@ -127,7 +125,7 @@
   --destructive: oklch(0.70 0.19 22);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.65 0.18 260);
+  --ring: oklch(0.70 0.14 152);
 
   --chart-1: oklch(0.65 0.18 260);
   --chart-2: oklch(0.75 0.17 45);
@@ -383,13 +381,13 @@
 
   /* ---- Premium gradients ---- */
   .gradient-emerald {
-    background: linear-gradient(135deg, oklch(0.55 0.18 260) 0%, oklch(0.45 0.16 265) 100%);
+    background: linear-gradient(135deg, #0f6b43 0%, #0a3f2b 100%);
   }
   .gradient-gold {
     background: linear-gradient(135deg, oklch(0.75 0.17 45) 0%, oklch(0.62 0.19 35) 100%);
   }
   .gradient-ethiopian {
-    background: linear-gradient(135deg, oklch(0.55 0.18 260) 0%, oklch(0.60 0.17 250) 50%, oklch(0.70 0.17 45) 100%);
+    background: linear-gradient(135deg, #0f5132 0%, #177245 52%, #d9a928 100%);
   }
   .gradient-mesh {
     background-color: oklch(0.98 0.003 250);
@@ -417,7 +415,7 @@
 
   /* ---- Text gradients ---- */
   .text-gradient-emerald {
-    background: linear-gradient(135deg, oklch(0.55 0.18 260), oklch(0.45 0.16 265));
+    background: linear-gradient(135deg, #0f6b43, #0a3f2b);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -431,7 +429,7 @@
     color: transparent;
   }
   .text-gradient-ethiopian {
-    background: linear-gradient(135deg, oklch(0.55 0.18 260), oklch(0.60 0.17 250), oklch(0.70 0.17 45));
+    background: linear-gradient(135deg, #0f5132, #177245, #d9a928);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -715,4 +713,12 @@
 }
 .safe-top {
   padding-top: env(safe-area-inset-top, 0px);
+}
+
+.font-ethiopic,
+:lang(am),
+:lang(ti) {
+  font-family: "Noto Sans Ethiopic", var(--font-geist-sans), sans-serif;
+  font-feature-settings: normal;
+  letter-spacing: normal;
 }

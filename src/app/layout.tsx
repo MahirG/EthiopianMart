@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import "@fontsource/noto-sans-ethiopic/400.css";
+import "@fontsource/noto-sans-ethiopic/700.css";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
@@ -27,20 +29,20 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Gulit.shop — Africa's Trusted Online Shopping Destination",
-  description: "Shop millions of products with confidence. Fast delivery, secure payments, and the best prices. Gulit.shop makes online shopping simple, trusted, fast, and enjoyable for everyone.",
-  keywords: ["Gulit.shop", "online shopping", "Africa shopping", "Ethiopia shopping", "Addis Ababa", "Telebirr", "e-commerce Africa", "AI shopping assistant"],
-  authors: [{ name: "Gulit.shop" }],
-  manifest: "/manifest.json",
+  title: "EthiopianMart — From Ethiopia, With Pride",
+  description: "A trusted marketplace for Ethiopian products, independent sellers, and everyday shopping with secure checkout and nationwide delivery.",
+  keywords: ["EthiopianMart", "Ethiopia marketplace", "Ethiopian products", "Addis Ababa shopping", "Telebirr", "local sellers"],
+  authors: [{ name: "EthiopianMart" }],
+  manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Gulit.shop",
+    title: "EthiopianMart",
   },
   openGraph: {
-    title: "Gulit.shop — Africa's Trusted Online Shopping Destination",
-    description: "Shop smart, save more. Simple, trusted, fast online shopping for everyone.",
-    siteName: "Gulit.shop",
+    title: "EthiopianMart — From Ethiopia, With Pride",
+    description: "Trusted Ethiopian products and everyday essentials from verified sellers.",
+    siteName: "EthiopianMart",
     type: "website",
     locale: "en_US",
   },
@@ -48,8 +50,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F8FAFC" },
-    { media: "(prefers-color-scheme: dark)", color: "#0F172A" },
+    { media: "(prefers-color-scheme: light)", color: "#F8F6EF" },
+    { media: "(prefers-color-scheme: dark)", color: "#10271D" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -65,9 +67,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${jakarta.variable}`} suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${jakarta.variable} antialiased bg-background text-foreground overflow-x-hidden`}
+        className="antialiased bg-background text-foreground overflow-x-hidden"
       >
         <a href="#main-content" className="skip-link">Skip to content</a>
         <ThemeProvider>

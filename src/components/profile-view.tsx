@@ -1,268 +1,47 @@
 'use client'
 
+import { signOut, useSession } from 'next-auth/react'
+import { useQuery } from '@tanstack/react-query'
+import { LogOut, Moon, PackageCheck, ShieldCheck, Store, Sun, UserRound } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
-import { t } from '@/lib/i18n'
-import { membershipTiers } from '@/lib/data'
-import { motion } from 'framer-motion'
-import { useSession, signOut } from 'next-auth/react'
-import {
-  Crown, Check, Star, Package, Heart, MapPin, Settings, HelpCircle,
-  Shield, Bell, Globe, LogOut, ChevronRight, Sparkles, TrendingUp,
-  Fingerprint, Smartphone, Award, Gift, Store, User as UserIcon,
-} from 'lucide-react'
-import { toast } from 'sonner'
+import { LanguageSelector } from './language-selector'
+
+async function fetchOrderSummary(): Promise<Array<{ id: string; total: number; status: string }>> {
+  const response = await fetch('/api/orders')
+  if (!response.ok) return []
+  return response.json()
+}
 
 export function ProfileView() {
-  const { language, setView, theme, toggleTheme, wishlist, openAuth } = useAppStore()
   const { data: session, status } = useSession()
+  const { openAuth, setView, theme, toggleTheme, wishlist } = useAppStore()
+  const orders = useQuery({ queryKey: ['orders-summary'], queryFn: fetchOrderSummary, enabled: status === 'authenticated' })
+  const role = (session?.user as { role?: string } | undefined)?.role ?? 'USER'
 
-  const isLoggedIn = status === 'authenticated' && !!session?.user
-  const userName = session?.user?.name || 'Guest User'
-  const userEmail = session?.user?.email || ''
-  const userRole = (session?.user as { role?: string })?.role || 'GUEST'
-  const initials = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+  if (status === 'loading') return <div className="grid min-h-[440px] place-items-center"><div className="h-9 w-9 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>
+  if (!session?.user) return <div className="mx-auto flex min-h-[480px] max-w-lg flex-col items-center justify-center text-center"><span className="grid h-16 w-16 place-items-center rounded-2xl bg-primary/10"><UserRound className="h-7 w-7 text-primary" /></span><h1 className="mt-6 text-2xl font-black">Your EthiopianMart account</h1><p className="mt-3 text-sm leading-6 text-muted-foreground">Sign in to manage orders, delivery details, wishlists, and seller tools.</p><div className="mt-6 flex gap-3"><button onClick={() => openAuth('login')} className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">Sign in</button><button onClick={() => openAuth('register')} className="rounded-full border border-border px-6 py-3 text-sm font-bold">Create account</button></div></div>
 
-  const menuItems = [
-    { icon: Package, label: t(language, 'myOrders'), action: () => isLoggedIn ? setView('orders') : openAuth('login'), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10' },
-    { icon: Heart, label: t(language, 'wishlist'), badge: wishlist.length, action: () => isLoggedIn ? toast.info('Wishlist opened') : openAuth('login'), color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-500/10' },
-    { icon: MapPin, label: t(language, 'addresses'), action: () => isLoggedIn ? toast.info('Addresses opened') : openAuth('login'), color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-500/10' },
-    { icon: Bell, label: 'Notifications', action: () => isLoggedIn ? useAppStore.getState().setNotifOpen(true) : openAuth('login'), color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500/10' },
-    { icon: Globe, label: 'Language & Region', action: () => toast.info('Language settings'), color: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-500/10' },
-    { icon: Shield, label: t(language, 'security'), action: () => toast.info('Security settings'), color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-500/10' },
-    { icon: Settings, label: t(language, 'accountSettings'), action: () => toast.info('Settings opened'), color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-500/10' },
-    { icon: HelpCircle, label: t(language, 'helpCenter'), action: () => toast.info('Help center opened'), color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-500/10' },
-  ]
+  const initials = session.user.name?.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'EM'
+  const completed = orders.data?.filter((order) => order.status === 'DELIVERED').length ?? 0
 
   return (
-    <div className="space-y-6 pb-8">
-      {/* Profile header */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl gradient-emerald p-6 text-primary-foreground shadow-glow"
-      >
-        <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="relative">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md text-2xl font-black">
-              {isLoggedIn ? initials : <UserIcon className="h-7 w-7" />}
-            </div>
-            {isLoggedIn && (
-              <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full gradient-gold text-[10px] font-bold text-white shadow-glow-gold">
-                <Crown className="h-3 w-3" />
-              </span>
-            )}
-          </div>
-          <div className="flex-1">
-            {isLoggedIn ? (
-              <>
-                <h2 className="text-xl font-black">{userName}</h2>
-                <p className="text-sm text-white/85">{userEmail}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold">
-                    <Crown className="h-2.5 w-2.5" /> {userRole}
-                  </span>
-                </div>
-              </>
-            ) : (
-              <>
-                <h2 className="text-xl font-black">Welcome to Gulit.shop</h2>
-                <p className="text-sm text-white/85">Sign in to access your account, orders, and wishlist</p>
-                <button
-                  onClick={() => openAuth('login')}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-xs font-bold text-primary tap-highlight-none"
-                >
-                  <UserIcon className="h-3.5 w-3.5" /> Sign In / Register
-                </button>
-              </>
-            )}
-          </div>
-        </div>
+    <div className="mx-auto max-w-4xl space-y-6 pb-8">
+      <section className="flex flex-col justify-between gap-6 rounded-[28px] bg-[#0f5132] p-7 text-white sm:flex-row sm:items-center">
+        <div className="flex items-center gap-4"><span className="grid h-16 w-16 place-items-center rounded-2xl bg-white/10 text-xl font-black">{initials}</span><div><p className="text-xs font-bold uppercase tracking-[.16em] text-[#f3c64d]">{role.toLowerCase()} account</p><h1 className="mt-1 text-2xl font-black">{session.user.name}</h1><p className="mt-1 text-sm text-white/65">{session.user.email}</p></div></div>
+        <button onClick={async () => { await signOut({ redirect: false }); setView('home') }} className="inline-flex w-fit items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-bold"><LogOut className="h-4 w-4" /> Sign out</button>
+      </section>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-2 mt-5">
-          {[
-            { label: 'Orders', value: '47' },
-            { label: 'Saved', value: '8,450 ETB' },
-            { label: 'Rewards', value: '1,320 ETB' },
-          ].map((stat, i) => (
-            <div key={i} className="rounded-xl bg-white/15 backdrop-blur-md p-3 text-center">
-              <div className="text-sm font-black">{stat.value}</div>
-              <div className="text-[10px] text-white/80">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </motion.div>
+      <div className="grid grid-cols-3 gap-3">{[
+        ['Orders', orders.data?.length ?? 0], ['Delivered', completed], ['Wishlist', wishlist.length],
+      ].map(([label, value]) => <div key={label} className="rounded-2xl border border-border bg-card p-5 text-center"><p className="text-2xl font-black">{value}</p><p className="mt-1 text-xs font-semibold text-muted-foreground">{label}</p></div>)}</div>
 
-      {/* Quick access dashboards */}
-      <div className="grid grid-cols-2 gap-3">
-        <button
-          onClick={() => setView('vendor')}
-          className="rounded-2xl glass p-4 text-left hover:shadow-premium transition-all tap-highlight-none"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 mb-2">
-            <Store className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-          </div>
-          <div className="font-bold text-sm">{t(language, 'sellOn')}</div>
-          <div className="text-xs text-muted-foreground">Vendor dashboard</div>
-        </button>
-        <button
-          onClick={() => setView('admin')}
-          className="rounded-2xl glass p-4 text-left hover:shadow-premium transition-all tap-highlight-none"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-500/10 mb-2">
-            <Shield className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-          </div>
-          <div className="font-bold text-sm">{t(language, 'adminPanel')}</div>
-          <div className="text-xs text-muted-foreground">Platform analytics</div>
-        </button>
-      </div>
+      <section className="overflow-hidden rounded-2xl border border-border bg-card">
+        <button onClick={() => setView('orders')} className="flex w-full items-center gap-4 border-b border-border p-5 text-left"><span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10"><PackageCheck className="h-5 w-5 text-primary" /></span><div><p className="text-sm font-extrabold">Orders and delivery</p><p className="text-xs text-muted-foreground">Track real purchases and delivery status</p></div></button>
+        {(role === 'VENDOR' || role === 'ADMIN') && <button onClick={() => setView(role === 'ADMIN' ? 'admin' : 'vendor')} className="flex w-full items-center gap-4 border-b border-border p-5 text-left"><span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10"><Store className="h-5 w-5 text-primary" /></span><div><p className="text-sm font-extrabold">{role === 'ADMIN' ? 'Admin workspace' : 'Seller portal'}</p><p className="text-xs text-muted-foreground">Manage marketplace operations</p></div></button>}
+        <div className="flex items-center justify-between gap-4 p-5"><div className="flex items-center gap-4"><span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10">{theme === 'light' ? <Sun className="h-5 w-5 text-primary" /> : <Moon className="h-5 w-5 text-primary" />}</span><div><p className="text-sm font-extrabold">Appearance</p><p className="text-xs text-muted-foreground">Choose light or dark mode</p></div></div><button onClick={toggleTheme} className="rounded-full border border-border px-4 py-2 text-xs font-bold">{theme === 'light' ? 'Use dark' : 'Use light'}</button></div>
+      </section>
 
-      {/* Security quick actions */}
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { icon: Fingerprint, label: 'Biometrics', desc: 'Enabled', color: 'text-emerald-600 dark:text-emerald-400' },
-          { icon: Smartphone, label: 'Passkeys', desc: 'Active', color: 'text-violet-600 dark:text-violet-400' },
-          { icon: Shield, label: '2FA', desc: 'On', color: 'text-amber-600 dark:text-amber-400' },
-        ].map((item, i) => {
-          const Icon = item.icon
-          return (
-            <div key={i} className="flex flex-col items-center gap-1 rounded-2xl glass p-4 text-center">
-              <Icon className={`h-5 w-5 ${item.color}`} />
-              <div className="font-bold text-xs">{item.label}</div>
-              <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">{item.desc}</div>
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Membership tiers */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-black flex items-center gap-2">
-            <Crown className="h-5 w-5 text-amber-500" />
-            {t(language, 'membership')}
-          </h2>
-          <button
-            onClick={() => setView('vendor')}
-            className="text-sm font-semibold text-primary"
-          >
-            Become a Seller
-          </button>
-        </div>
-        <div className="space-y-3">
-          {membershipTiers.map((tier, i) => (
-            <motion.div
-              key={tier.name}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className={`relative overflow-hidden rounded-2xl p-5 ${
-                tier.popular ? 'glass-strong border-2 border-amber-500/50 shadow-glow-gold' : 'glass'
-              }`}
-            >
-              {tier.popular && (
-                <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full gradient-gold px-2.5 py-1 text-[10px] font-bold text-white">
-                  <Star className="h-2.5 w-2.5 fill-white" /> POPULAR
-                </span>
-              )}
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${tier.color} text-white shadow-premium`}>
-                  <Crown className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-black text-lg">{tier.name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {tier.price === 0 ? 'Free forever' : `${tier.price} ETB ${t(language, 'perMonth')}`}
-                  </p>
-                </div>
-              </div>
-              <ul className="space-y-1.5">
-                {tier.benefits.map((benefit, j) => (
-                  <li key={j} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
-                    <span>{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-              {tier.name !== 'Gold' && (
-                <button
-                  onClick={() => toast.success(`Upgraded to ${tier.name}! 🎉`)}
-                  className={`mt-4 w-full rounded-xl py-2.5 font-bold text-sm tap-highlight-none ${
-                    tier.popular
-                      ? 'gradient-gold text-white shadow-glow-gold'
-                      : 'bg-accent hover:bg-accent/70'
-                  }`}
-                >
-                  {tier.price === 0 ? 'Current Plan' : `Upgrade to ${tier.name}`}
-                </button>
-              )}
-              {tier.name === 'Gold' && (
-                <div className="mt-4 w-full rounded-xl gradient-emerald py-2.5 text-center font-bold text-sm text-primary-foreground">
-                  Current Plan ✓
-                </div>
-              )}
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* Menu */}
-      <div className="rounded-2xl glass overflow-hidden">
-        {menuItems.map((item, i) => {
-          const Icon = item.icon
-          return (
-            <button
-              key={i}
-              onClick={item.action}
-              className="flex w-full items-center gap-3 p-3 hover:bg-accent/50 transition-colors tap-highlight-none border-b border-border/30 last:border-0"
-            >
-              <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${item.bg}`}>
-                <Icon className={`h-4 w-4 ${item.color}`} />
-              </div>
-              <span className="flex-1 text-left font-medium text-sm">{item.label}</span>
-              {item.badge !== undefined && (
-                <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary">
-                  {item.badge}
-                </span>
-              )}
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </button>
-          )
-        })}
-      </div>
-
-      {/* Theme toggle */}
-      <button
-        onClick={toggleTheme}
-        className="flex w-full items-center justify-between rounded-2xl glass p-4 tap-highlight-none"
-      >
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/10">
-            {theme === 'light' ? '🌙' : '☀️'}
-          </div>
-          <span className="font-medium text-sm">Theme</span>
-        </div>
-        <span className="text-sm font-semibold capitalize">{theme}</span>
-      </button>
-
-      {/* Logout */}
-      {isLoggedIn && (
-        <button
-          onClick={() => {
-            signOut({ callbackUrl: '/' })
-            toast.success('Signed out successfully')
-          }}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-destructive/10 py-3 font-semibold text-destructive tap-highlight-none hover:bg-destructive/20 transition-colors"
-        >
-          <LogOut className="h-4 w-4" /> Logout
-        </button>
-      )}
-
-      {/* Version */}
-      <div className="text-center text-xs text-muted-foreground">
-        Gulit.shop v1.0.0 • Made with ❤️ for Africa 🌍
-      </div>
+      <section className="flex flex-col justify-between gap-4 rounded-2xl border border-border bg-card p-5 sm:flex-row sm:items-center"><div className="flex gap-4"><ShieldCheck className="h-6 w-6 text-primary" /><div><p className="text-sm font-extrabold">Account and language</p><p className="mt-1 text-xs text-muted-foreground">Your session is protected with secure, HTTP-only authentication cookies.</p></div></div><LanguageSelector /></section>
     </div>
   )
 }

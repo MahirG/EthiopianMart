@@ -14,7 +14,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { ProductFormModal } from './admin-product-form'
 
-interface Product {
+interface Product extends Record<string, unknown> {
   id: string
   name: string
   price: number
@@ -66,28 +66,24 @@ export function AdminView() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const [productsRes, ordersRes] = await Promise.all([
+      const [productsRes, ordersRes, usersRes] = await Promise.all([
         fetch('/api/admin/products'),
         fetch('/api/admin/orders'),
+        fetch('/api/admin/users'),
       ])
-
-      if (productsRes.ok) {
-        const productsData = await productsRes.json()
-        setProducts(productsData)
-      }
-      if (ordersRes.ok) {
-        const ordersData = await ordersRes.json()
-        setOrders(ordersData)
-      }
-
-      // Calculate real stats
-      const revenue = ordersRes.ok
-        ? (await ordersRes.json()).reduce((sum: number, o: Order) => sum + o.total, 0)
-        : 0
+      if (!productsRes.ok || !ordersRes.ok || !usersRes.ok) throw new Error('An admin data endpoint failed')
+      const [productsData, ordersData, usersData] = await Promise.all([
+        productsRes.json(), ordersRes.json(), usersRes.json(),
+      ])
+      setProducts(productsData)
+      setOrders(ordersData)
+      const revenue = ordersData
+        .filter((order: Order) => order.status !== 'CANCELLED' && order.paymentStatus !== 'REFUNDED')
+        .reduce((sum: number, order: Order) => sum + order.total, 0)
       setStats({
-        totalUsers: 8450, // Would come from a real endpoint
-        totalProducts: products.length,
-        totalOrders: orders.length,
+        totalUsers: usersData.length,
+        totalProducts: productsData.length,
+        totalOrders: ordersData.length,
         totalRevenue: revenue,
       })
     } catch (error) {
@@ -95,11 +91,12 @@ export function AdminView() {
     } finally {
       setLoading(false)
     }
-  }, [products.length, orders.length])
+  }, [])
 
   useEffect(() => {
     if (isAdmin) {
-      fetchData()
+      const timeout = window.setTimeout(() => void fetchData(), 0)
+      return () => window.clearTimeout(timeout)
     }
   }, [isAdmin, fetchData])
 
@@ -122,9 +119,6 @@ export function AdminView() {
         >
           Sign In as Admin
         </button>
-        <p className="text-xs text-muted-foreground mt-4">
-          Demo: admin@gulit.shop / admin123
-        </p>
       </div>
     )
   }

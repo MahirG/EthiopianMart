@@ -55,8 +55,8 @@ export async function POST(req: Request) {
         data: {
           userId: user.id,
           type: 'new_arrival',
-          title: 'Welcome to Gulit.shop! 🎉',
-          message: `Welcome ${name}! Start exploring millions of products with the best prices and fast delivery.`,
+          title: 'Welcome to EthiopianMart! 🎉',
+          message: `Welcome ${name}! Explore products from EthiopianMart sellers and keep your orders in one place.`,
           icon: '👋',
           read: false,
         },

@@ -57,7 +57,7 @@ export function AuthModal({ open, onClose, mode: initialMode, onSuccess }: AuthM
         throw new Error('Invalid email or password')
       }
 
-      toast.success(mode === 'register' ? 'Welcome to Gulit.shop! 🎉' : 'Welcome back! 👋')
+      toast.success(mode === 'register' ? 'Welcome to EthiopianMart!' : 'Welcome back!')
 
       // Fetch session to determine role and redirect accordingly
       try {
@@ -89,16 +89,6 @@ export function AuthModal({ open, onClose, mode: initialMode, onSuccess }: AuthM
     }
   }
 
-  const fillDemo = (type: 'user' | 'vendor' | 'admin') => {
-    const creds = {
-      user: { email: 'user@gulit.shop', password: 'user123' },
-      vendor: { email: 'vendor@gulit.shop', password: 'vendor123' },
-      admin: { email: 'admin@gulit.shop', password: 'admin123' },
-    }
-    setFormData((f) => ({ ...f, ...creds[type] }))
-    setMode('login')
-  }
-
   return (
     <AnimatePresence>
       {open && (
@@ -116,10 +106,10 @@ export function AuthModal({ open, onClose, mode: initialMode, onSuccess }: AuthM
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-              className="relative w-full max-w-md rounded-3xl liquid-glass shadow-elevated overflow-hidden pointer-events-auto max-h-[90vh] overflow-y-auto scrollbar-thin"
+              className="relative w-full max-w-md overflow-hidden rounded-3xl border border-border bg-background shadow-elevated pointer-events-auto max-h-[90vh] overflow-y-auto scrollbar-thin"
             >
               {/* Header */}
-              <div className="relative gradient-emerald p-6 text-primary-foreground">
+              <div className="relative bg-[#0f5132] p-6 text-white">
                 <button
                   onClick={onClose}
                   className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors tap-highlight-none"
@@ -129,15 +119,15 @@ export function AuthModal({ open, onClose, mode: initialMode, onSuccess }: AuthM
                 </button>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-md">
-                    <span className="font-black font-display">G</span>
+                    <span className="font-black font-display">E</span>
                   </div>
-                  <span className="font-black text-lg font-display">Gulit.shop</span>
+                  <span className="font-black text-lg font-display">EthiopianMart</span>
                 </div>
                 <h2 className="text-2xl font-black font-display tracking-tight">
                   {mode === 'login' ? 'Welcome back' : 'Create your account'}
                 </h2>
                 <p className="text-sm text-white/85 mt-1">
-                  {mode === 'login' ? 'Sign in to continue shopping' : 'Join millions of happy shoppers'}
+                  {mode === 'login' ? 'Sign in to continue shopping' : 'Create your secure marketplace account'}
                 </p>
               </div>
 
@@ -217,7 +207,7 @@ export function AuthModal({ open, onClose, mode: initialMode, onSuccess }: AuthM
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl gradient-emerald py-3 font-bold text-sm text-primary-foreground shadow-glow disabled:opacity-50 transition-opacity tap-highlight-none"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary py-3 font-bold text-sm text-primary-foreground disabled:opacity-50 transition-opacity tap-highlight-none"
                 >
                   {loading ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> {mode === 'login' ? 'Signing in...' : 'Creating account...'}</>
@@ -238,28 +228,6 @@ export function AuthModal({ open, onClose, mode: initialMode, onSuccess }: AuthM
                   </button>
                 </div>
 
-                {/* Demo credentials */}
-                <div className="pt-3 border-t border-border/40">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-2 text-center">
-                    Demo Accounts (click to fill)
-                  </p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { type: 'user' as const, label: 'Shopper' },
-                      { type: 'vendor' as const, label: 'Vendor' },
-                      { type: 'admin' as const, label: 'Admin' },
-                    ].map((d) => (
-                      <button
-                        key={d.type}
-                        type="button"
-                        onClick={() => fillDemo(d.type)}
-                        className="rounded-lg glass px-2 py-1.5 text-[10px] font-semibold hover:shadow-premium transition-shadow tap-highlight-none"
-                      >
-                        {d.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </form>
             </motion.div>
           </div>

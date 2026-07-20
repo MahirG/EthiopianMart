@@ -1,571 +1,151 @@
 'use client'
 
-import { useAppStore } from '@/lib/store'
-import { t } from '@/lib/i18n'
-import { categories, products, bestSellers, customerReviews, brandHighlights } from '@/lib/data'
-import { ProductCard } from './product-card'
+import { useQuery } from '@tanstack/react-query'
+import { ArrowRight, BadgeCheck, Coffee, Gem, Landmark, MapPin, PackageCheck, Scissors, ShieldCheck, Store, Truck, Wheat } from 'lucide-react'
 import { motion } from 'framer-motion'
-import {
-  Sparkles, TrendingUp, Flame, Clock, ChevronRight, Crown, Zap,
-  TrendingDown, Wallet, Gift, Shield, Truck, Award, Star, MapPin,
-} from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { fetchCatalogCategories, fetchCatalogProducts } from '@/lib/catalog'
+import { useAppStore } from '@/lib/store'
+import { ProductCard } from './product-card'
+import { CategoryGlyph } from './category-glyph'
 
-const heroSlides = [
-  {
-    title: 'Mega Sale Event',
-    subtitle: 'Up to 40% off on top products',
-    cta: 'Shop Deals',
-    gradient: 'from-blue-600 via-blue-700 to-indigo-700',
-    emoji: '🛍️',
-    badge: 'Limited Time',
-  },
-  {
-    title: 'Fresh Yirgacheffe Coffee',
-    subtitle: 'Direct from farmers, save 23%',
-    cta: 'Buy Coffee',
-    gradient: 'from-orange-500 via-orange-600 to-red-500',
-    emoji: '☕',
-    badge: 'Just Arrived',
-  },
-  {
-    title: 'Tech Festival',
-    subtitle: 'Samsung, JBL & more — lowest prices',
-    cta: 'Shop Electronics',
-    gradient: 'from-blue-600 via-violet-600 to-purple-600',
-    emoji: '📱',
-    badge: 'Flash Sale',
-  },
-]
-
-function CountdownTimer() {
-  const [time, setTime] = useState({ h: 2, m: 34, s: 12 })
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTime((prev) => {
-        let { h, m, s } = prev
-        s--
-        if (s < 0) { s = 59; m-- }
-        if (m < 0) { m = 59; h-- }
-        if (h < 0) { h = 23 }
-        return { h, m, s }
-      })
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [])
-  const pad = (n: number) => n.toString().padStart(2, '0')
+function ProductSkeleton() {
   return (
-    <div className="flex items-center gap-1">
-      {[time.h, time.m, time.s].map((v, i) => (
-        <span key={i} className="flex items-center gap-1">
-          <span className="rounded-md bg-black/30 px-1.5 py-0.5 font-mono text-sm font-bold text-white tabular-nums">
-            {pad(v)}
-          </span>
-          {i < 2 && <span className="text-white/70">:</span>}
-        </span>
-      ))}
+    <div className="overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="aspect-[4/3] skeleton-premium" />
+      <div className="space-y-3 p-4"><div className="h-3 w-20 rounded skeleton-premium" /><div className="h-4 w-full rounded skeleton-premium" /><div className="h-5 w-24 rounded skeleton-premium" /></div>
     </div>
   )
 }
 
-// Stagger container for reveal animations
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
-  },
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-  },
-}
-
 export function HomeView() {
-  const { language, setView, setAiOpen } = useAppStore()
-  const [activeSlide, setActiveSlide] = useState(0)
+  const { setView, setCatalogCategory, setCatalogLocal } = useAppStore()
+  const categoriesQuery = useQuery({ queryKey: ['catalog-categories'], queryFn: fetchCatalogCategories })
+  const latestQuery = useQuery({
+    queryKey: ['catalog-products', 'latest'],
+    queryFn: () => fetchCatalogProducts({ limit: 8, sort: 'newest' }),
+  })
+  const localQuery = useQuery({
+    queryKey: ['catalog-products', 'local'],
+    queryFn: () => fetchCatalogProducts({ limit: 8, isLocal: true, sort: 'rating' }),
+  })
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveSlide((s) => (s + 1) % heroSlides.length)
-    }, 5500)
-    return () => clearInterval(interval)
-  }, [])
-
-  const trending = products.slice(0, 6)
-  const deals = products.filter((p) => p.discount && p.discount >= 20).slice(0, 6)
-  const newArrivals = [...products].reverse().slice(0, 6)
+  const shopLocal = () => {
+    setCatalogCategory('all')
+    setCatalogLocal(true)
+  }
 
   return (
-    <div className="space-y-8 sm:space-y-10 pb-8">
-      {/* Hero Carousel */}
-      <section className="relative" aria-label="Featured promotions">
-        <div className="relative overflow-hidden rounded-3xl shadow-float">
-          <motion.div
-            key={activeSlide}
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className={`relative bg-gradient-to-br ${heroSlides[activeSlide].gradient} px-6 py-10 sm:px-12 sm:py-16 min-h-[280px] sm:min-h-[360px] flex items-center`}
-          >
-            {/* Decorative blobs — dynamic lighting */}
-            <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
-            <div className="absolute -bottom-24 right-40 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
-            <div className="absolute top-1/2 left-1/4 h-40 w-40 rounded-full bg-white/5 blur-2xl" />
-
-            <div className="relative z-10 max-w-lg">
-              <motion.span
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-md px-3 py-1 text-xs font-bold text-white"
-              >
-                <Zap className="h-3 w-3" /> {heroSlides[activeSlide].badge}
-              </motion.span>
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-                className="mt-4 text-3xl sm:text-5xl font-black text-white leading-tight font-display tracking-tight text-balance"
-              >
-                {heroSlides[activeSlide].title}
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-                className="mt-2 text-base sm:text-lg text-white/90 font-medium"
-              >
-                {heroSlides[activeSlide].subtitle}
-              </motion.p>
-              <motion.button
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.6 }}
-                whileTap={{ scale: 0.96 }}
-                whileHover={{ scale: 1.04 }}
-                onClick={() => setView('search')}
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-gray-900 shadow-xl tap-highlight-none"
-              >
-                {heroSlides[activeSlide].cta}
-                <ChevronRight className="h-4 w-4" />
-              </motion.button>
-            </div>
-
-            {/* Big emoji — floating animation, pointer-events-none so it never blocks taps */}
-            <motion.div
-              animate={{ y: [0, -10, 0], rotate: [0, 4, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute right-4 sm:right-16 top-1/2 -translate-y-1/2 text-7xl sm:text-9xl opacity-90 drop-shadow-2xl pointer-events-none select-none"
-              aria-hidden="true"
-            >
-              {heroSlides[activeSlide].emoji}
-            </motion.div>
-
-            {/* Slide indicators */}
-            <div className="absolute bottom-4 left-6 flex gap-1.5">
-              {heroSlides.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveSlide(i)}
-                  className={`h-1.5 rounded-full transition-all ${
-                    i === activeSlide ? 'w-8 bg-white' : 'w-1.5 bg-white/50'
-                  }`}
-                  aria-label={`Go to slide ${i + 1}`}
-                />
-              ))}
+    <div className="space-y-16 pb-8 sm:space-y-20">
+      <section className="relative overflow-hidden rounded-[28px] bg-[#0b3d2a] text-white sm:rounded-[36px]">
+        <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(120deg,transparent_0%,transparent_45%,rgba(243,198,77,.24)_45%,rgba(243,198,77,.24)_52%,transparent_52%,transparent_61%,rgba(200,74,52,.25)_61%,rgba(200,74,52,.25)_67%,transparent_67%)]" />
+        <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full border-[42px] border-white/5" />
+        <div className="relative grid min-h-[480px] items-center gap-10 px-6 py-12 sm:px-10 lg:grid-cols-[1.1fr_.9fr] lg:px-16 lg:py-16">
+          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold text-[#f3c64d]">
+              <BadgeCheck className="h-4 w-4" /> Ethiopia&apos;s home marketplace
+            </span>
+            <p lang="am" className="font-ethiopic mt-7 text-sm font-semibold text-white/65">ከኢትዮጵያ፣ ለኢትዮጵያ</p>
+            <h1 className="mt-3 max-w-3xl text-[clamp(2.65rem,7vw,5.6rem)] font-black leading-[.92] tracking-[-0.065em] text-white">
+              Good things,<br /><span className="text-[#f3c64d]">made closer.</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-7 text-white/75 sm:text-lg">
+              Discover trusted sellers, remarkable Ethiopian products, and everyday essentials—delivered across the country.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button onClick={shopLocal} className="inline-flex items-center gap-2 rounded-full bg-[#f3c64d] px-6 py-3.5 text-sm font-extrabold text-[#173326] transition hover:-translate-y-0.5 hover:bg-[#ffda68]">
+                Shop made in Ethiopia <ArrowRight className="h-4 w-4" />
+              </button>
+              <button onClick={() => setView('search')} className="rounded-full border border-white/25 bg-white/5 px-6 py-3.5 text-sm font-bold text-white hover:bg-white/10">Browse everything</button>
             </div>
           </motion.div>
-        </div>
-      </section>
 
-      {/* Quick stats bar */}
-      <motion.section
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="grid grid-cols-2 sm:grid-cols-4 gap-3"
-      >
-        {[
-          { icon: Wallet, label: 'You Saved', value: '8,450 ETB', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10' },
-          { icon: TrendingDown, label: 'Price Alerts', value: '12 active', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500/10' },
-          { icon: Truck, label: 'Free Delivery', value: 'Eligible', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-500/10' },
-          { icon: Gift, label: 'Cashback', value: '320 ETB', color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-500/10' },
-        ].map((stat, i) => {
-          const Icon = stat.icon
-          return (
-            <motion.div
-              key={i}
-              variants={itemVariants}
-              whileHover={{ y: -2 }}
-              className="rounded-2xl glass p-4 transition-shadow hover:shadow-premium"
-            >
-              <div className={`mb-2 flex h-9 w-9 items-center justify-center rounded-xl ${stat.bg}`}>
-                <Icon className={`h-4 w-4 ${stat.color}`} />
-              </div>
-              <div className="text-lg font-black tracking-tight">{stat.value}</div>
-              <div className="text-xs text-muted-foreground">{stat.label}</div>
-            </motion.div>
-          )
-        })}
-      </motion.section>
-
-      {/* AI Savings Insights */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-50px' }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="rounded-3xl liquid-glass p-6 sm:p-8 shadow-float relative overflow-hidden"
-      >
-        <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-emerald-500/10 blur-2xl" />
-        <div className="absolute -bottom-16 -left-16 h-40 w-40 rounded-full bg-amber-500/10 blur-2xl" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-emerald text-primary-foreground shadow-glow">
-              <Sparkles className="h-4 w-4" />
-            </div>
-            <span className="text-sm font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">AI Savings Insights</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black mb-4 font-display tracking-tight text-balance">
-            You can save <span className="text-gradient-emerald">530 Birr</span> today! 🎉
-          </h2>
-          <div className="grid sm:grid-cols-3 gap-3">
-            {[
-              { title: 'Bundle Deal', desc: 'Coffee + Berbere + Teff = Save 530 ETB', icon: Gift },
-              { title: 'Price Prediction', desc: 'Wait till Friday for 18% extra off', icon: TrendingDown },
-              { title: 'Nearby Store', desc: 'Highland Grains is 12% cheaper', icon: MapPin },
-            ].map((tip, i) => {
-              const Icon = tip.icon
-              return (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.15 }}
-                  className="rounded-2xl glass-strong p-4"
-                >
-                  <Icon className="h-5 w-5 mb-2 text-emerald-600 dark:text-emerald-400" />
-                  <div className="font-bold text-sm">{tip.title}</div>
-                  <div className="text-xs text-muted-foreground mt-1">{tip.desc}</div>
-                </motion.div>
-              )
-            })}
-          </div>
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            whileHover={{ scale: 1.02 }}
-            onClick={() => setAiOpen(true)}
-            className="mt-4 inline-flex items-center gap-2 rounded-full gradient-emerald px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow tap-highlight-none"
-          >
-            <Sparkles className="h-4 w-4" /> Chat with AI Assistant
-          </motion.button>
-        </div>
-      </motion.section>
-
-      {/* Categories */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-black font-display tracking-tight">
-            <span className="text-gradient-emerald">{t(language, 'categories')}</span>
-          </h2>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            className="text-sm font-semibold text-primary flex items-center gap-1 hover:gap-2 transition-all"
-          >
-            {t(language, 'viewAll')} <ChevronRight className="h-4 w-4" />
-          </motion.button>
-        </div>
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-3"
-        >
-          {categories.slice(0, 8).map((cat) => (
-            <motion.button
-              key={cat.id}
-              variants={itemVariants}
-              whileHover={{ y: -4, scale: 1.03 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setView('search')}
-              className="group flex flex-col items-center gap-2 p-2 tap-highlight-none"
-              aria-label={`Browse ${cat.name}`}
-            >
-              <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${cat.color} text-2xl shadow-premium group-hover:shadow-glow transition-shadow`}>
-                <span className="group-hover:scale-110 transition-transform duration-300">{cat.icon}</span>
-              </div>
-              <span className="text-[11px] font-medium text-center line-clamp-2 leading-tight text-balance">{cat.name}</span>
-            </motion.button>
-          ))}
-        </motion.div>
-      </section>
-
-      {/* Flash Sale */}
-      <section className="rounded-3xl glass p-5 sm:p-6">
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-gold text-white shadow-glow-gold">
-              <Flame className="h-5 w-5" />
-            </div>
-            <div>
-              <h2 className="text-xl font-black font-display tracking-tight">{t(language, 'flashSale')}</h2>
-              <p className="text-xs text-muted-foreground">{t(language, 'endingSoon')}</p>
-            </div>
-          </div>
-          <CountdownTimer />
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {deals.map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} />
-          ))}
-        </div>
-      </section>
-
-      {/* Membership Banner */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-50px' }}
-        transition={{ duration: 0.6 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 p-6 sm:p-8 text-white shadow-float"
-      >
-        <motion.div
-          animate={{ rotate: [0, 5, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute -right-10 -bottom-10 text-9xl opacity-20"
-        >
-          👑
-        </motion.div>
-        <div className="relative z-10 max-w-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <Crown className="h-5 w-5" />
-            <span className="text-sm font-bold uppercase tracking-wide">Gulit.shop Membership</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-black mb-2 font-display tracking-tight text-balance">Unlock Premium Savings</h2>
-          <p className="text-white/90 mb-4">Free delivery, 20% cashback, exclusive deals & VIP AI concierge.</p>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {['Free Delivery', '20% Cashback', 'VIP Support', 'Early Access'].map((b) => (
-              <span key={b} className="rounded-full bg-white/20 backdrop-blur-md px-3 py-1 text-xs font-semibold">
-                {b}
-              </span>
-            ))}
-          </div>
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            whileHover={{ scale: 1.03 }}
-            onClick={() => setView('profile')}
-            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-blue-700 shadow-xl tap-highlight-none"
-          >
-            <Crown className="h-4 w-4" /> {t(language, 'joinNow')} — from 299 ETB{t(language, 'perMonth')}
-          </motion.button>
-        </div>
-      </motion.section>
-
-      {/* Trending */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-black flex items-center gap-2 font-display tracking-tight">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            <span className="text-gradient-emerald">{t(language, 'trending')}</span>
-          </h2>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            className="text-sm font-semibold text-primary flex items-center gap-1 hover:gap-2 transition-all"
-          >
-            {t(language, 'viewAll')} <ChevronRight className="h-4 w-4" />
-          </motion.button>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {trending.map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} />
-          ))}
-        </div>
-      </section>
-
-      {/* Trust badges */}
-      <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { icon: Shield, title: 'Secure Payments', desc: 'Bank-grade encryption' },
-          { icon: Truck, title: 'Fast Delivery', desc: 'Same-day in Addis Ababa' },
-          { icon: Award, title: 'Verified Vendors', desc: 'Trusted local sellers' },
-          { icon: Star, title: '24/7 Support', desc: 'AI + human help' },
-        ].map((item, i) => {
-          const Icon = item.icon
-          return (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              whileHover={{ y: -2 }}
-              className="flex items-center gap-3 rounded-2xl glass p-4 transition-shadow hover:shadow-premium"
-            >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                <Icon className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <div className="text-sm font-bold">{item.title}</div>
-                <div className="text-xs text-muted-foreground">{item.desc}</div>
-              </div>
-            </motion.div>
-          )
-        })}
-      </section>
-
-      {/* New Arrivals */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-black flex items-center gap-2 font-display tracking-tight">
-            <Clock className="h-5 w-5 text-primary" />
-            <span className="text-gradient-emerald">{t(language, 'newArrivals')}</span>
-          </h2>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            className="text-sm font-semibold text-primary flex items-center gap-1 hover:gap-2 transition-all"
-          >
-            {t(language, 'viewAll')} <ChevronRight className="h-4 w-4" />
-          </motion.button>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {newArrivals.map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} />
-          ))}
-        </div>
-      </section>
-
-      {/* Best Sellers */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-black flex items-center gap-2 font-display tracking-tight">
-            <Award className="h-5 w-5 text-amber-500" />
-            <span className="text-gradient-gold">Best Sellers</span>
-          </h2>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            className="text-sm font-semibold text-primary flex items-center gap-1 hover:gap-2 transition-all"
-          >
-            {t(language, 'viewAll')} <ChevronRight className="h-4 w-4" />
-          </motion.button>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {bestSellers.map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} />
-          ))}
-        </div>
-      </section>
-
-      {/* Customer Reviews */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-xl font-black flex items-center gap-2 font-display tracking-tight">
-              <Star className="h-5 w-5 fill-amber-500 text-amber-500" />
-              <span className="text-gradient-emerald">What Our Customers Say</span>
-            </h2>
-            <p className="text-xs text-muted-foreground mt-1">Real reviews from verified Ethiopian shoppers</p>
-          </div>
-          <div className="text-right">
-            <div className="text-2xl font-black">4.9/5</div>
-            <div className="text-xs text-muted-foreground">2.4M+ reviews</div>
-          </div>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {customerReviews.map((review, i) => (
-            <motion.div
-              key={review.id}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-30px' }}
-              transition={{ delay: i * 0.08 }}
-              className="rounded-2xl glass p-4 flex flex-col"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br ${review.color} text-white font-bold text-sm`}>
-                  {review.avatar}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-bold text-sm truncate">{review.name}</div>
-                  <div className="text-xs text-muted-foreground flex items-center gap-1">
-                    <MapPin className="h-3 w-3" /> {review.location}
+          <div className="relative mx-auto hidden w-full max-w-md lg:block" aria-hidden="true">
+            <div className="aspect-square rotate-3 rounded-[42px] border border-white/15 bg-white/[.07] p-7 backdrop-blur-sm">
+              <div className="grid h-full grid-cols-2 gap-4">
+                {[
+                  [Coffee, 'Yirgacheffe'], [Scissors, 'Handwoven'], [Wheat, 'From our farms'], [Gem, 'Local craft'],
+                ].map(([Icon, label], index) => {
+                  const FeatureIcon = Icon as typeof Coffee
+                  return <div key={label as string} className={`flex flex-col justify-end rounded-3xl border border-white/10 bg-white/10 p-5 ${index === 1 || index === 2 ? 'translate-y-5' : ''}`}>
+                    <FeatureIcon className="h-10 w-10 text-[#f3c64d]" /><span className="mt-4 text-xs font-bold text-white/75">{label as string}</span>
                   </div>
-                </div>
-                <div className="flex gap-0.5">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className="h-3 w-3 fill-amber-500 text-amber-500" />
-                  ))}
-                </div>
+                })}
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed flex-1 line-clamp-4">{review.text}</p>
-              <div className="mt-3 pt-3 border-t border-border/30">
-                <span className="text-xs font-semibold text-primary">✓ Verified Purchase</span>
-                <span className="text-xs text-muted-foreground ml-2">— {review.product}</span>
-              </div>
-            </motion.div>
-          ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Brand Highlights */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-black flex items-center gap-2 font-display tracking-tight">
-            <Award className="h-5 w-5 text-primary" />
-            <span className="text-gradient-emerald">Trusted Brands</span>
-          </h2>
+      <section aria-labelledby="categories-title">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div><p className="text-xs font-bold uppercase tracking-[.18em] text-primary">Start here</p><h2 id="categories-title" className="mt-2 text-2xl font-extrabold sm:text-3xl">Shop by category</h2></div>
+          <button onClick={() => setView('search')} className="hidden items-center gap-1 text-sm font-bold text-primary sm:flex">View all <ArrowRight className="h-4 w-4" /></button>
         </div>
-        <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
-          {brandHighlights.map((brand, i) => (
-            <motion.button
-              key={brand.name}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              whileHover={{ y: -3, scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setView('search')}
-              className="flex flex-col items-center gap-2 rounded-2xl glass p-3 hover:shadow-premium transition-shadow tap-highlight-none"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent/40 to-muted text-2xl">
-                {brand.icon}
-              </div>
-              <span className="text-xs font-bold truncate">{brand.name}</span>
-              <span className="text-[10px] text-muted-foreground">{brand.products} products</span>
-            </motion.button>
+        <div className="grid grid-cols-4 gap-3 sm:grid-cols-6 lg:grid-cols-8">
+          {(categoriesQuery.data ?? []).slice(0, 8).map((category) => (
+            <button key={category.id} onClick={() => { setCatalogLocal(false); setCatalogCategory(category.id) }} className="group flex min-w-0 flex-col items-center gap-3 rounded-2xl border border-transparent p-2 text-center transition hover:border-border hover:bg-card hover:shadow-sm">
+              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-muted text-primary transition group-hover:-translate-y-1 group-hover:bg-primary/10"><CategoryGlyph category={category.id} /></span>
+              <span className="line-clamp-2 text-[11px] font-bold leading-tight">{category.name}</span>
+            </button>
           ))}
+          {categoriesQuery.isLoading && Array.from({ length: 8 }).map((_, index) => <div key={index} className="mx-auto h-20 w-16 rounded-2xl skeleton-premium" />)}
         </div>
       </section>
 
-      {/* Stats footer */}
-      <section className="rounded-3xl gradient-mesh p-6 sm:p-8 text-center">
-        <h3 className="text-lg font-black mb-4 font-display tracking-tight">{t(language, 'trustedBy')} millions of happy shoppers</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <section aria-labelledby="local-title">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div><p className="text-xs font-bold uppercase tracking-[.18em] text-[#c84a34]">Rooted here</p><h2 id="local-title" className="mt-2 text-2xl font-extrabold sm:text-3xl">Made in Ethiopia</h2><p className="mt-2 text-sm text-muted-foreground">Products that carry local skill, ingredients, and livelihoods forward.</p></div>
+          <button onClick={shopLocal} className="hidden items-center gap-1 text-sm font-bold text-primary sm:flex">Explore local <ArrowRight className="h-4 w-4" /></button>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
+          {localQuery.data?.products.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)}
+          {localQuery.isLoading && Array.from({ length: 8 }).map((_, index) => <ProductSkeleton key={index} />)}
+        </div>
+        {localQuery.isError && (
+          <div className="rounded-2xl border border-dashed border-border p-8 text-center"><p className="font-bold">We couldn&apos;t load local products.</p><button onClick={() => localQuery.refetch()} className="mt-3 text-sm font-bold text-primary">Try again</button></div>
+        )}
+      </section>
+
+      <section className="grid overflow-hidden rounded-[28px] border border-border bg-card lg:grid-cols-[.8fr_1.2fr]">
+        <div className="bg-[#f1e9d7] p-8 text-[#173326] sm:p-10 lg:p-12">
+          <Store className="h-9 w-9" />
+          <h2 className="mt-8 text-3xl font-black sm:text-4xl">Your work deserves a bigger market.</h2>
+          <p className="mt-4 max-w-md leading-7 text-[#365644]">Open your EthiopianMart seller portal, manage real inventory and orders, and reach customers beyond your neighborhood.</p>
+          <button onClick={() => setView('vendor')} className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#0f5132] px-6 py-3 text-sm font-bold text-white">Open seller portal <ArrowRight className="h-4 w-4" /></button>
+        </div>
+        <div className="grid grid-cols-2 gap-px bg-border sm:grid-cols-4 lg:grid-cols-2">
           {[
-            { value: '2.4M+', label: t(language, 'happyShoppers') },
-            { value: '50K+', label: t(language, 'productsAvailable') },
-            { value: '8.5K+', label: t(language, 'localVendors') },
-            { value: '120+', label: t(language, 'citiesServed') },
-          ].map((stat, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, type: 'spring', stiffness: 200 }}
-            >
-              <div className="text-2xl sm:text-3xl font-black text-gradient-emerald font-display tracking-tight">{stat.value}</div>
-              <div className="text-xs text-muted-foreground mt-1">{stat.label}</div>
-            </motion.div>
-          ))}
+            [BadgeCheck, 'Verified sellers', 'Seller identity and ownership checks'],
+            [PackageCheck, 'Real inventory', 'Stock-aware product and order flows'],
+            [Landmark, 'Local payments', 'Telebirr, CBE Birr, Chapa and cash'],
+            [MapPin, 'Ethiopian delivery', 'Address and order tracking built in'],
+          ].map(([Icon, title, description]) => {
+            const FeatureIcon = Icon as typeof BadgeCheck
+            return <div key={title as string} className="bg-background p-6 sm:p-8"><FeatureIcon className="h-6 w-6 text-primary" /><h3 className="mt-5 text-base font-extrabold">{title as string}</h3><p className="mt-2 text-xs leading-5 text-muted-foreground">{description as string}</p></div>
+          })}
         </div>
+      </section>
+
+      <section aria-labelledby="new-title">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div><p className="text-xs font-bold uppercase tracking-[.18em] text-primary">Fresh to market</p><h2 id="new-title" className="mt-2 text-2xl font-extrabold sm:text-3xl">New arrivals</h2></div>
+          <button onClick={() => setView('search')} className="hidden items-center gap-1 text-sm font-bold text-primary sm:flex">Shop all <ArrowRight className="h-4 w-4" /></button>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {latestQuery.data?.products.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)}
+          {latestQuery.isLoading && Array.from({ length: 8 }).map((_, index) => <ProductSkeleton key={index} />)}
+        </div>
+      </section>
+
+      <section className="grid gap-4 border-y border-border py-8 sm:grid-cols-3">
+        {[
+          [ShieldCheck, 'Shop with confidence', 'Secure authentication and protected transactions.'],
+          [Truck, 'Delivery that fits Ethiopia', 'Clear delivery times and order status at every step.'],
+          [Store, 'Local businesses first', 'A marketplace built to help Ethiopian sellers grow.'],
+        ].map(([Icon, title, description]) => {
+          const TrustIcon = Icon as typeof ShieldCheck
+          return <div key={title as string} className="flex gap-4 p-3"><TrustIcon className="h-6 w-6 shrink-0 text-primary" /><div><h3 className="text-sm font-extrabold">{title as string}</h3><p className="mt-1 text-xs leading-5 text-muted-foreground">{description as string}</p></div></div>
+        })}
       </section>
     </div>
   )

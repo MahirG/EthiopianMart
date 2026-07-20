@@ -8,11 +8,12 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const product = await db.product.findUnique({
-      where: { id },
+    const product = await db.product.findFirst({
+      where: { id, isActive: true, isArchived: false, isPublished: true },
       include: {
         category: { select: { name: true, slug: true } },
         vendor: { select: { name: true } },
+        variants: true,
         reviews: {
           include: { user: { select: { name: true } } },
           orderBy: { createdAt: 'desc' },
@@ -39,6 +40,12 @@ export async function GET(
         categoryId: product.categoryId,
         id: { not: product.id },
         isActive: true,
+        isArchived: false,
+        isPublished: true,
+      },
+      include: {
+        category: { select: { name: true, slug: true } },
+        vendor: { select: { name: true } },
       },
       take: 4,
     })

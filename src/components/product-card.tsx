@@ -1,10 +1,11 @@
 'use client'
 
-import { useAppStore } from '@/lib/store'
-import type { Product } from '@/lib/types'
+import { BadgeCheck, Heart, Plus, Star, Truck } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { Heart, Star, MapPin, Plus, Truck, Sparkles, TrendingDown, Eye } from 'lucide-react'
 import { toast } from 'sonner'
+import type { Product } from '@/lib/types'
+import { useAppStore } from '@/lib/store'
+import { CategoryGlyph } from './category-glyph'
 
 interface ProductCardProps {
   product: Product
@@ -13,157 +14,76 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, compact = false, index = 0 }: ProductCardProps) {
-  const { addToCart, wishlist, toggleWishlist, setSelectedProduct, setQuickViewProduct } = useAppStore()
+  const { addToCart, wishlist, toggleWishlist, setSelectedProduct } = useAppStore()
   const isWishlisted = wishlist.includes(product.id)
 
-  const handleAdd = (e: React.MouseEvent) => {
-    e.stopPropagation()
+  const add = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    if (!product.inStock) return
     addToCart(product)
-    toast.success(`${product.name} added to cart`, {
-      description: `Save ${product.bundleSavings || 0} Birr with smart bundle`,
-    })
+    toast.success('Added to cart', { description: product.name })
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
+    <motion.article
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: Math.min(index * 0.05, 0.3), ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -6, transition: { type: 'spring', stiffness: 400, damping: 25 } }}
-      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.35, delay: Math.min(index * 0.035, 0.2) }}
       onClick={() => setSelectedProduct(product)}
-      className="group relative cursor-pointer overflow-hidden rounded-2xl glass tap-highlight-none transition-shadow md:hover:shadow-float"
+      className="group cursor-pointer overflow-hidden rounded-2xl border border-border/80 bg-card transition duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-[0_18px_40px_-24px_rgba(23,51,38,.35)]"
     >
-      {/* Image area */}
-      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-accent/40 via-muted to-accent/30">
-        {/* Dynamic lighting overlay — subtle, no hover change on touch */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent opacity-60 pointer-events-none" />
+      <div className="relative aspect-[4/3] overflow-hidden bg-[#f3efe5] dark:bg-muted">
+        {product.image ? (
+          <img src={product.image} alt={product.name} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+        ) : (
+          <div className="grid h-full place-items-center text-primary transition duration-500 group-hover:scale-105" role="img" aria-label={product.category}>
+            <CategoryGlyph category={product.category} className="h-16 w-16" />
+          </div>
+        )}
 
-        <div className="absolute inset-0 flex items-center justify-center text-6xl transition-transform duration-500 ease-out-soft group-active:scale-110 md:group-hover:scale-110">
-          {product.categoryIcon}
+        <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+          {product.isLocal && <span className="rounded-full bg-[#0f5132] px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-wide text-white">Made in Ethiopia</span>}
+          {product.discount && <span className="rounded-full bg-[#f3c64d] px-2.5 py-1 text-[9px] font-extrabold text-[#173326]">Save {product.discount}%</span>}
         </div>
 
-        {/* Badges */}
-        <div className="absolute left-2.5 top-2.5 flex flex-col gap-1.5">
-          {product.discount && (
-            <span className="rounded-full gradient-gold px-2.5 py-0.5 text-[10px] font-bold text-white shadow-glow-gold backdrop-blur-sm">
-              −{product.discount}%
-            </span>
-          )}
-          {product.isLocal && (
-            <span className="rounded-full bg-emerald-600/95 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm backdrop-blur-sm">
-              🇪🇹 Local
-            </span>
-          )}
-          {product.isHandmade && (
-            <span className="rounded-full bg-amber-700/95 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm backdrop-blur-sm">
-              ✋ Handmade
-            </span>
-          )}
-        </div>
-
-        {/* Wishlist */}
-        <motion.button
-          whileTap={{ scale: 0.85 }}
-          onClick={(e) => {
-            e.stopPropagation()
-            toggleWishlist(product.id)
-          }}
-          className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full glass-strong tap-highlight-none transition-shadow md:hover:shadow-sm"
+        <button
+          onClick={(event) => { event.stopPropagation(); toggleWishlist(product.id) }}
+          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full border border-black/5 bg-white/90 text-[#173326] shadow-sm backdrop-blur"
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
-          <motion.span
-            animate={isWishlisted ? { scale: [1, 1.3, 1] } : { scale: 1 }}
-            transition={{ duration: 0.4 }}
-          >
-            <Heart className={`h-4 w-4 transition-colors ${isWishlisted ? 'fill-destructive text-destructive' : 'text-foreground'}`} />
-          </motion.span>
-        </motion.button>
-
-        {/* Quick View button — appears on hover (desktop) / always (mobile) */}
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={(e) => {
-            e.stopPropagation()
-            setQuickViewProduct(product)
-          }}
-          className="absolute right-2.5 top-12 flex h-8 w-8 items-center justify-center rounded-full glass-strong tap-highlight-none transition-shadow md:opacity-0 md:group-hover:opacity-100 md:hover:shadow-sm"
-          aria-label={`Quick view ${product.name}`}
-        >
-          <Eye className="h-4 w-4" />
-        </motion.button>
-
-        {/* AI savings tip — always visible on mobile (hover on desktop) */}
-        {product.bundleSavings && (
-          <div className="absolute bottom-2.5 left-2.5 right-2.5 opacity-100 md:translate-y-1 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 transition-all duration-300 ease-out-soft">
-            <div className="flex items-center gap-1.5 rounded-xl glass-strong px-2.5 py-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-              <Sparkles className="h-3 w-3 shrink-0" />
-              <span className="truncate">Save {product.bundleSavings} Birr</span>
-            </div>
-          </div>
-        )}
+          <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-[#c84a34] text-[#c84a34]' : ''}`} />
+        </button>
       </div>
 
-      {/* Content */}
-      <div className={`p-3 ${compact ? 'space-y-1' : 'space-y-2'}`}>
-        {/* Vendor */}
-        <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-          <MapPin className="h-2.5 w-2.5" />
+      <div className={compact ? 'p-3' : 'p-4'}>
+        <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground">
+          <BadgeCheck className="h-3.5 w-3.5 text-primary" />
           <span className="truncate">{product.vendor}</span>
         </div>
+        <h3 className="mt-2 line-clamp-2 min-h-10 text-sm font-extrabold leading-5 tracking-[-0.02em]">{product.name}</h3>
 
-        {/* Name */}
-        <h3 className={`font-semibold leading-tight line-clamp-2 text-balance ${compact ? 'text-xs' : 'text-sm'}`}>
-          {product.name}
-        </h3>
-
-        {/* Rating */}
-        <div className="flex items-center gap-1.5">
-          <div className="flex items-center gap-0.5 rounded-md bg-amber-500/10 px-1.5 py-0.5">
-            <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
-            <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">{product.rating}</span>
-          </div>
-          <span className="text-[10px] text-muted-foreground">({product.reviewCount.toLocaleString()})</span>
-          {product.deliveryDays <= 2 && (
-            <span className="ml-auto flex items-center gap-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-              <Truck className="h-3 w-3" />
-              {product.deliveryDays}d
-            </span>
-          )}
+        <div className="mt-2 flex items-center gap-2 text-[10px] text-muted-foreground">
+          {product.reviewCount > 0 ? (
+            <span className="flex items-center gap-1"><Star className="h-3 w-3 fill-[#e3a921] text-[#e3a921]" /><strong className="text-foreground">{product.rating.toFixed(1)}</strong> ({product.reviewCount})</span>
+          ) : <span>New</span>}
+          <span className="ml-auto flex items-center gap-1"><Truck className="h-3.5 w-3.5" /> {product.deliveryDays}–{product.deliveryDays + 1} days</span>
         </div>
 
-        {/* Price */}
-        <div className="flex items-end justify-between gap-2 pt-0.5">
-          <div className="min-w-0">
-            <div className="flex items-baseline gap-1">
-              <span className="text-base font-black tracking-tight">{product.price.toLocaleString()}</span>
-              <span className="text-[10px] font-medium text-muted-foreground">ETB</span>
-            </div>
-            {product.originalPrice && (
-              <span className="text-[11px] text-muted-foreground line-through">
-                {product.originalPrice.toLocaleString()}
-              </span>
-            )}
+        <div className="mt-4 flex items-end justify-between gap-2 border-t border-border/70 pt-3">
+          <div>
+            <div className="flex items-baseline gap-1"><span className="text-lg font-black tracking-[-0.04em]">{product.price.toLocaleString()}</span><span className="text-[10px] font-bold text-muted-foreground">ETB</span></div>
+            {product.originalPrice && <span className="text-[10px] text-muted-foreground line-through">{product.originalPrice.toLocaleString()} ETB</span>}
           </div>
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-            onClick={handleAdd}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl gradient-emerald text-primary-foreground shadow-glow tap-highlight-none md:hover:scale-108"
-            aria-label={`Add ${product.name} to cart`}
+          <button
+            onClick={add}
+            disabled={!product.inStock}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground transition hover:scale-105 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
+            aria-label={product.inStock ? `Add ${product.name} to cart` : `${product.name} is out of stock`}
           >
-            <Plus className="h-4 w-4" strokeWidth={2.5} />
-          </motion.button>
+            <Plus className="h-[18px] w-[18px]" strokeWidth={2.5} />
+          </button>
         </div>
-
-        {/* AI prediction */}
-        {product.bestTimeToBuy && !compact && (
-          <div className="flex items-center gap-1 rounded-lg bg-primary/5 px-2 py-1 text-[10px] text-primary">
-            <TrendingDown className="h-3 w-3" />
-            <span>Best to buy on {product.bestTimeToBuy}</span>
-          </div>
-        )}
       </div>
-    </motion.div>
+    </motion.article>
   )
 }

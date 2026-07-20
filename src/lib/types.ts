@@ -6,9 +6,7 @@ export type View =
   | 'home'
   | 'search'
   | 'cart'
-  | 'ai'
   | 'orders'
-  | 'wallet'
   | 'profile'
   | 'vendor'
   | 'admin'
@@ -87,15 +85,6 @@ export interface Notification {
   time: string
   read: boolean
   icon: string
-}
-
-export interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: string
-  suggestions?: string[]
-  products?: Product[]
 }
 
 export interface Vendor {
